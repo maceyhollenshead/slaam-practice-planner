@@ -111,7 +111,18 @@ Organization (client)  — branding, custom templates, master drill bank, tier(s
 3. Build backend when triggered: D1 lead goes real, OR AAU coach validates concept. Same multi-tenant work either way.
 - **Open input needed:** how real/near is the D1 opportunity? (drives whether we validate-cheap first or scope the backend now)
 
+## Coach reply + build backlog (2026-06-14)
+Coach's words after seeing v1: *"I'm using AI a little for design, not at all for planning. Would love to find a way to automate scheduling for practices or improve practice planning. Building any tools to share with new coaches would be a huge win for me too as we're trying to normalize some coaching across the program!"*
+- Confirms the two pillars (planning + normalize-coaching) and explicitly names **scheduling** (previously deferred) and **AI-for-planning gap** ("not at all for planning").
+- **Build backlog (priority order):**
+  1. **Drill Library / "SLAAM Playbook of drills"** — shared drill bank in SLAAM voice; the core normalize-coaching asset + IP capture. (low effort)
+  2. **"The SLAAM Way" coach onboarding kit** — bundle the Standard + plan template + drill library + a non-negotiables card + terminology glossary + "how to run a SLAAM practice" 1-pager. The shareable kit for new coaches. (content work, fast)
+  3. **AI plan-generator** — directly fills his "not using AI for planning" gap. Tier 1: copy-paste prompt now; Tier 2: "Generate with AI" button in the planner. (low → medium)
+  4. **Scheduling (scope first)** — he asked for it but it's messy and means different things (gym slots vs coach availability vs parent comms). Light version: recurring practice-calendar generator + printable month / .ics export. Heavy version (availability/gym optimization): defer. NEED: clarify his actual scheduling pain.
+  5. **AI-for-design (adjacent, low priority)** — branded social/game-day graphic templates; he values design but it's off NextEdge's core.
+
 ## Idea log (append-only)
+- 2026-06-14 — Coach reply confirms planning + normalize-coaching as top wants, adds scheduling + flags he does NO AI planning yet. Logged as build backlog above. Deployed v1.3 to GitHub Pages (live link) for him to test.
 - 2026-06-14 — Coach request: add a **practice start time** + a per-segment **clock column** so segment times roll up from the start (e.g. starts 2:00 → next block 2:08…) and the coach can check their watch against the plan to stay on pace. Shipped in planner v1.2 (also shows projected end time).
 - 2026-06-14 — Coach idea: make practice plans interactive ("HTML file") inside NextEdge — like plays, stored in folders, dropdown layouts, drag-in drills they draw up. = the Practice Plan tab. Decided to prototype as standalone HTML first, then port into Playbook.
 - 2026-06-14 — Framework: 3 layers of help — coach productivity (now) → player/team development (film) → the "brain" (vision). Started at Layer 1.
