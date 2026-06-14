@@ -51,6 +51,7 @@
   table.blocks td{padding:4px 6px;vertical-align:top;border-top:1px solid var(--line)}
   table.blocks tr.seg-main.drop-on td{background:var(--pink-soft)}
   .min-in{width:60px;text-align:center}
+  .clock-cell{text-align:center;font-weight:800;color:var(--pink);font-variant-numeric:tabular-nums;white-space:nowrap}
   .rowbtns{display:flex;gap:3px;flex-wrap:wrap}
   .rowbtns button{background:#f0f0f2;width:26px;height:26px;font-size:13px;line-height:1;color:var(--grey);padding:0}
   .rowbtns button.del:hover{background:#ffdeee;color:var(--pink)}
@@ -154,6 +155,7 @@
         <div class="f"><label>Team / Age</label><input id="m_team" oninput="touch()" placeholder="e.g. 14U Power 24"/></div>
         <div class="f"><label>Date</label><input id="m_date" type="date" oninput="touch()"/></div>
         <div class="f"><label>Duration (min)</label><input id="m_dur" type="number" value="90" oninput="touch();renderTotal()"/></div>
+        <div class="f"><label>Practice starts</label><input id="m_start" type="time" oninput="touch();renderSegments()"/></div>
         <div class="f"><label>Coach</label><input id="m_coach" oninput="touch()"/></div>
         <div class="f"><label>Location</label><input id="m_loc" oninput="touch()"/></div>
         <div class="f"><label>Theme of the Day</label><input id="m_theme" oninput="touch()" placeholder="e.g. Transition defense"/></div>
@@ -165,7 +167,7 @@
       <h2>Practice Segments <span class="mini" style="text-transform:none;color:var(--grey)">— drag a drill onto a row · tap ⋯ for notes, attachments, or a draw box</span></h2>
       <table class="blocks">
         <thead>
-          <tr><th style="width:46px">Min</th><th style="width:28%">Segment</th><th>Drill / Focus</th><th>Coaching Points</th><th style="width:92px"></th></tr>
+          <tr><th style="width:62px">Clock</th><th style="width:46px">Min</th><th style="width:26%">Segment</th><th>Drill / Focus</th><th>Coaching Points</th><th style="width:92px"></th></tr>
         </thead>
         <tbody id="blockBody"></tbody>
       </table>
@@ -173,7 +175,7 @@
         <button onclick="addSegment()">＋ Add segment</button>
         <span class="hint">Tip: drag drills from the library →</span>
       </div>
-      <div class="total"><span>Total:</span><span class="pill" id="totalPill">0 min</span></div>
+      <div class="total"><span>Total:</span><span class="pill" id="totalPill">0 min</span><span class="endnote" id="endNote" style="color:var(--grey);font-size:13px"></span></div>
     </div>
 
     <div class="card" style="margin-top:16px">
@@ -214,7 +216,7 @@
 /* =========================================================
    DATA MODEL  (maps to the Playbook port: Drill / Plan / Folder)
    segment = {label, minutes, drill, points, detail, attach{name,type,data}|null, drawBox, open}
-   plan    = {team,date,duration,coach,location,theme,focus[],segments[],notes}
+   plan    = {team,date,duration,startTime,coach,location,theme,focus[],segments[],notes}
    ========================================================= */
 const FOCUS_OPTIONS = ["Skill","Competition","Team Offense","Team Defense","Culture"];
 
@@ -240,7 +242,7 @@ const SEED_DRILLS = [
 let state = { plan: blankPlan(), customDrills: load("slaam_custom_drills", []), dirty:false };
 
 function blankPlan(){
-  return { team:"",date:"",duration:90,coach:"",location:"",theme:"",focus:[],
+  return { team:"",date:"",duration:90,startTime:"",coach:"",location:"",theme:"",focus:[],
            segments: DEFAULT_TEMPLATE.map(([label,minutes])=>seg(label,minutes)),
            notes:"" };
 }
@@ -265,14 +267,19 @@ function renderFocus(){
 
 function renderSegments(){
   const body=document.getElementById('blockBody'); body.innerHTML='';
+  const startMin=parseClock(val('m_start')); // minutes-from-midnight, or null
+  let cursor=startMin;
   state.plan.segments.forEach((b,i)=>{
+    const clock = cursor==null ? '—' : fmtClock(cursor);
+    if(cursor!=null) cursor += (+b.minutes||0);
     const tr=document.createElement('tr');
     tr.className='seg-main';
     tr.ondragover=e=>{e.preventDefault();tr.classList.add('drop-on');};
     tr.ondragleave=()=>tr.classList.remove('drop-on');
     tr.ondrop=e=>{e.preventDefault();tr.classList.remove('drop-on');dropDrill(e,i);};
     tr.innerHTML=`
-      <td><input class="min-in" type="number" value="${b.minutes||0}" onchange="setSeg(${i},'minutes',this.value*1);renderTotal()"></td>
+      <td class="clock-cell">${clock}</td>
+      <td><input class="min-in" type="number" value="${b.minutes||0}" onchange="setSeg(${i},'minutes',this.value*1);renderSegments()"></td>
       <td><input value="${esc(b.label)}" oninput="setSeg(${i},'label',this.value)"></td>
       <td><input value="${esc(b.drill)}" oninput="setSeg(${i},'drill',this.value)" placeholder="drill name / focus"></td>
       <td><textarea oninput="setSeg(${i},'points',this.value)" placeholder="coaching points">${esc(b.points)}</textarea></td>
@@ -288,7 +295,7 @@ function renderSegments(){
     if(show){
       const dr=document.createElement('tr');
       const td=document.createElement('td');
-      td.colSpan=5; td.className='detail-cell';
+      td.colSpan=6; td.className='detail-cell';
       td.appendChild(buildDetail(b,i));
       dr.appendChild(td); body.appendChild(dr);
     }
@@ -340,7 +347,15 @@ function renderTotal(){
   const pill=document.getElementById('totalPill');
   pill.textContent=sum+' min'+(target?` / ${target}`:'');
   pill.className='pill'+(sum>target&&target?' over':(sum===target&&target?' exact':''));
+  const start=parseClock(val('m_start')); const note=document.getElementById('endNote');
+  if(note) note.textContent = start==null ? '' : `Starts ${fmtClock(start)} · ends ${fmtClock(start+sum)}`;
 }
+
+/* ---------- clock helpers ---------- */
+function parseClock(s){ if(!s)return null; const m=/^(\d{1,2}):(\d{2})$/.exec(s); if(!m)return null;
+  return (+m[1])*60 + (+m[2]); }
+function fmtClock(mins){ mins=((mins%1440)+1440)%1440; let h=Math.floor(mins/60), mm=mins%60;
+  const ap=h>=12?'p':'a'; h=h%12; if(h===0)h=12; return h+':'+(mm<10?'0'+mm:mm)+ap; }
 
 function renderDrills(){
   const q=(document.getElementById('drillSearch').value||'').toLowerCase();
@@ -430,12 +445,12 @@ function saveNewDrill(){
 /* ---------- plan persistence ---------- */
 function readMeta(){
   const p=state.plan;
-  p.team=val('m_team');p.date=val('m_date');p.duration=+val('m_dur')||0;p.coach=val('m_coach');
+  p.team=val('m_team');p.date=val('m_date');p.duration=+val('m_dur')||0;p.startTime=val('m_start');p.coach=val('m_coach');
   p.location=val('m_loc');p.theme=val('m_theme');p.notes=val('m_notes');
 }
 function writeMeta(){
   const p=state.plan;
-  set('m_team',p.team);set('m_date',p.date);set('m_dur',p.duration);set('m_coach',p.coach);
+  set('m_team',p.team);set('m_date',p.date);set('m_dur',p.duration);set('m_start',p.startTime);set('m_coach',p.coach);
   set('m_loc',p.location);set('m_theme',p.theme);set('m_notes',p.notes);
 }
 function savePlan(){
@@ -473,6 +488,7 @@ function importJSON(ev){ const f=ev.target.files[0]; if(!f)return;
 /* ---------- utils ---------- */
 function migrate(p){ // tolerate older plans that used "blocks"
   if(!p.segments && p.blocks) p.segments=p.blocks;
+  if(p.startTime===undefined) p.startTime="";
   (p.segments||[]).forEach(s=>{ if(s.detail===undefined)s.detail=""; if(s.attach===undefined)s.attach=null; if(s.drawBox===undefined)s.drawBox=false; s.open=false; });
   if(!p.segments) p.segments=[];
   return p;

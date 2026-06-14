@@ -18,9 +18,10 @@ Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PD
 | `build.js` | Generator script for the two .docx files (`node build.js`) |
 | `SLAAM_TRACKER.md` | Running tracker of the SLAAM × NextEdge project (ideas, decisions, roadmap) |
 
-## Planner features (v1.1)
+## Planner features (v1.2)
 - SLAAM-branded (lime + pink), girls-program voice
 - Practice **Details** + "SLAAM Focus" chips
+- **Start time → live clock:** set when practice starts and each segment shows the **wall-clock time** it begins (e.g. 2:00p, 2:08p…). Change any segment's minutes and the whole schedule re-times — glance at your watch to see if you're on pace. Shows projected end time too.
 - **Segments** (time blocks) with live total vs. target duration
 - **⋯ panel** per segment: notes (teams/extra items), drop a PDF/image, or a blank **draw box** to sketch plays by hand
 - **Drill Library** — drag a drill onto a segment; add your own drills (with diagram images)

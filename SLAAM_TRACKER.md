@@ -112,6 +112,7 @@ Organization (client)  — branding, custom templates, master drill bank, tier(s
 - **Open input needed:** how real/near is the D1 opportunity? (drives whether we validate-cheap first or scope the backend now)
 
 ## Idea log (append-only)
+- 2026-06-14 — Coach request: add a **practice start time** + a per-segment **clock column** so segment times roll up from the start (e.g. starts 2:00 → next block 2:08…) and the coach can check their watch against the plan to stay on pace. Shipped in planner v1.2 (also shows projected end time).
 - 2026-06-14 — Coach idea: make practice plans interactive ("HTML file") inside NextEdge — like plays, stored in folders, dropdown layouts, drag-in drills they draw up. = the Practice Plan tab. Decided to prototype as standalone HTML first, then port into Playbook.
 - 2026-06-14 — Framework: 3 layers of help — coach productivity (now) → player/team development (film) → the "brain" (vision). Started at Layer 1.
 - 2026-06-14 — Practice plan + drill bank are the *same artifact* as "normalize coaching" — a shared format/standard.
