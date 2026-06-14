@@ -176,6 +176,7 @@
   </select>
   <button class="ghost" onclick="deleteSaved()">🗑 Delete</button>
   <div class="grow"></div>
+  <a href="drills.html" class="ghost" style="text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;display:inline-flex;align-items:center">📋 Drill Library</a>
   <button class="ghost" onclick="exportJSON()">⤓ Export</button>
   <button class="ghost" onclick="document.getElementById('imp').click()">⤒ Import</button>
   <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(event)" />
@@ -261,17 +262,38 @@ const DEFAULT_TEMPLATE = [
   ["Team Offense",12],["Team Defense",12],["Compete-to-Close",10],["Cool-Down & Message",6],
 ];
 
+// Seeded SLAAM drill bank. Full reference (with purpose/setup/age) lives in drills.html.
 const SEED_DRILLS = [
-  {name:"3-Man Weave + Finish",category:"Warm-Up",minutes:6,coachingPoints:"Sprint the lanes, crisp passes, finish through contact. No walking."},
+  {name:"Dynamic Warm-Up Series",category:"Warm-Up",minutes:8,coachingPoints:"Full effort, sharp lines, no walking. We warm up loud."},
+  {name:"3-Man Weave + Finish",category:"Warm-Up",minutes:6,coachingPoints:"Sprint the lanes, crisp passes, finish through contact."},
+  {name:"Partner Passing Series",category:"Warm-Up",minutes:5,coachingPoints:"Step into every pass, target hands, no lazy lobs."},
   {name:"Two-Ball Dribble Series",category:"Ball-Handling",minutes:8,coachingPoints:"Eyes up, pound the dribble, stay low. Both hands equal reps."},
-  {name:"Mikan + Reverse Mikan",category:"Finishing",minutes:6,coachingPoints:"Soft touch off glass, footwork timing, finish both sides."},
-  {name:"Form Shooting → Spot-Up",category:"Shooting",minutes:10,coachingPoints:"Feet set, hold follow-through, game pace on catch. Count makes."},
-  {name:"Closeout 1v1",category:"Defense",minutes:8,coachingPoints:"Sprint-to-breakdown, high hands, force baseline, contest no foul."},
-  {name:"Shell Defense (4v4)",category:"Defense",minutes:12,coachingPoints:"Talk, jump-to-ball, help & recover. No middle penetration."},
-  {name:"3v3 Small-Sided — Live",category:"Competition",minutes:14,coachingPoints:"Score it. Win the possession. Compete every rep, no easy buckets."},
-  {name:"Transition 2v1 / 3v2",category:"Offense",minutes:10,coachingPoints:"Run wide, sprint to spots, make the read, finish in 2 passes."},
+  {name:"Stationary Pound & Glove Series",category:"Ball-Handling",minutes:6,coachingPoints:"Fingertips not palm, hard dribbles, head up."},
+  {name:"Full-Court Move Series",category:"Ball-Handling",minutes:8,coachingPoints:"Sell the move, change speeds, finish every trip."},
+  {name:"Pressure Keep-Away (1v1)",category:"Ball-Handling",minutes:6,coachingPoints:"Body between ball and defender, chin the steals, stay composed."},
+  {name:"Mikan + Reverse Mikan",category:"Finishing",minutes:6,coachingPoints:"Soft touch off glass, finish both sides, no rushing."},
+  {name:"Finish Through Contact",category:"Finishing",minutes:8,coachingPoints:"Absorb contact, strong base, expect the foul and finish."},
+  {name:"Euro & Floater Progression",category:"Finishing",minutes:6,coachingPoints:"Read on the catch, change pace, finish over not into."},
+  {name:"Transition Layup Lines",category:"Finishing",minutes:5,coachingPoints:"Sprint wide, finish high, opposite hand opposite side."},
+  {name:"Form Shooting → Spot-Up",category:"Shooting",minutes:10,coachingPoints:"Feet set, hold the follow-through, game pace on the catch. Count makes."},
+  {name:"Catch-and-Shoot off the Pass",category:"Shooting",minutes:8,coachingPoints:"Hands ready, hop into the catch, no dip — up quick."},
+  {name:"Pull-Up Series",category:"Shooting",minutes:8,coachingPoints:"Gather on balance, rise straight up, hold it."},
+  {name:"5-Spot Shooting (vs the Clock)",category:"Competition",minutes:8,coachingPoints:"Compete every rep. Loud makes count. Finish strong."},
+  {name:"Free Throws — Game Pressure",category:"Conditioning",minutes:6,coachingPoints:"Same routine every time. Make FTs tired. We don't fold."},
+  {name:"Transition 2v1 / 3v2",category:"Offense",minutes:10,coachingPoints:"Run wide, sprint to spots, read the defender, finish."},
+  {name:"Pick-and-Roll Reads",category:"Offense",minutes:10,coachingPoints:"Use the screen shoulder-to-hip, read the big, make the simple play."},
+  {name:"5-on-0 Flow / Motion",category:"Offense",minutes:8,coachingPoints:"Space the floor, cut hard, talk the actions out loud."},
+  {name:"Give-and-Go / Backdoor",category:"Offense",minutes:6,coachingPoints:"Pass and move — never stand. Cut to score, not to clear."},
+  {name:"Defensive Slides / Zig-Zag",category:"Defense",minutes:6,coachingPoints:"Stay low, push off the back foot, don't cross your feet."},
+  {name:"Closeout 1v1",category:"Defense",minutes:8,coachingPoints:"Sprint-to-breakdown, high hands, force baseline, contest — no foul."},
+  {name:"On-Ball Pressure & Deny",category:"Defense",minutes:6,coachingPoints:"Nose on the ball, hand in the passing lane, talk."},
+  {name:"Shell Defense (4v4)",category:"Defense",minutes:12,coachingPoints:"Talk every action, jump to the ball, help and recover. No middle."},
+  {name:"Box-Out War",category:"Rebounding",minutes:6,coachingPoints:"Hit first, find a body, chin the ball, two hands. Be unbreakable."},
+  {name:"3v3 Small-Sided — Live",category:"Competition",minutes:14,coachingPoints:"Score it. Win the possession. No easy buckets."},
+  {name:"1v1 from the Wing",category:"Competition",minutes:8,coachingPoints:"Attack a shoulder, finish or get fouled — defense, make her earn it."},
   {name:"BLOB / SLOB Sets",category:"Situational",minutes:8,coachingPoints:"Know the set, screen with purpose, get a layup or open three."},
-  {name:"Compete-to-Close (sprints+FTs)",category:"Conditioning",minutes:6,coachingPoints:"Finish strong. Make FTs tired. Loud, fearless, unbreakable."},
+  {name:"Late-Game Situations",category:"Situational",minutes:6,coachingPoints:"Know the situation, value every possession, execute under pressure."},
+  {name:"Compete-to-Close (sprints+FTs)",category:"Conditioning",minutes:6,coachingPoints:"Finish strong. Loud, fearless, unbreakable."},
 ];
 
 let state = { plan: blankPlan(), customDrills: load("slaam_custom_drills", []), dirty:false };

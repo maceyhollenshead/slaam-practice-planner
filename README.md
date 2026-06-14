@@ -13,6 +13,7 @@ Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PD
 | File | What it is |
 |------|------------|
 | `index.html` / `practice_planner.html` | The interactive planner (single self-contained file, works offline) |
+| `drills.html` | The SLAAM Drill Library — shared, searchable, printable drill bank (30 drills, purpose + setup + coaching points) |
 | `SLAAM_Standard.docx` | The "SLAAM Standard" coaching-identity 1-pager (printable) |
 | `SLAAM_Practice_Plan.docx` | Printable fill-in practice plan template |
 | `build.js` | Generator script for the two .docx files (`node build.js`) |

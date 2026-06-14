@@ -28,7 +28,7 @@
 Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 - [x] **The SLAAM Standard** (1-pager) — `slaam_kit/SLAAM_Standard.docx` ✅ built, branded (pink/lime), validated
 - [x] **Practice Plan template** — `slaam_kit/SLAAM_Practice_Plan.docx` ✅ built, fillable/printable, validated
-- [ ] **Drill Library** — shared drill bank (name, purpose, setup, coaching points, time) ← this is what actually normalizes coaching
+- [x] **Drill Library** — `drills.html` ✅ shared, searchable, printable SLAAM drill bank (30 drills: purpose, setup, coaching points, time, age level), branded + linked from the planner; same drills seeded into the planner's in-tool library. ← this is what actually normalizes coaching. Next: swap in the coach's real drills.
 - [ ] **AI plan-generator prompt** — copy-paste prompt: coach types "U14, 90 min, transition D focus" → filled plan in SLAAM format
 - _Note: generator at `slaam_kit/build.js`. No LibreOffice locally → can't render image previews; docs validate clean._
 

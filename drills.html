@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SLAAM Drill Library — Powered by NextEdge</title>
+<style>
+  :root{
+    --pink:#FF2D8E; --pink-soft:#FFEAF4; --lime:#C6FF1A; --ink:#141414;
+    --grey:#6b6b6b; --line:#e6e6e6; --bg:#f6f6f7; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+  a{color:var(--pink)}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-weight:700}
+  input{font-family:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;width:100%;background:#fff}
+
+  header.app{background:var(--pink);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:16px}
+  header.app .logo{font-size:26px;font-weight:900;letter-spacing:.5px}
+  header.app .tag{color:var(--lime);font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:1px}
+  header.app .spacer{flex:1}
+  header.app .by{font-size:12px;opacity:.95}
+  header.app .by b{color:var(--lime)}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;padding:12px 22px;background:#fff;border-bottom:1px solid var(--line);align-items:center}
+  .toolbar .search{flex:1;min-width:180px;max-width:420px}
+  .toolbar a.back{text-decoration:none;background:#f0f0f2;color:var(--ink);border-radius:8px;padding:9px 13px;font-size:13px;font-weight:700}
+  .toolbar button.print{background:var(--ink);color:#fff;padding:9px 13px;font-size:13px}
+  .toolbar .count{font-size:12px;color:var(--grey);font-weight:700}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:10px 22px 0}
+  .chip{padding:6px 13px;border-radius:999px;border:1.5px solid var(--line);font-size:12px;font-weight:800;background:#fff;color:var(--grey);text-transform:uppercase;letter-spacing:.4px}
+  .chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+
+  .intro{padding:12px 22px 0;color:var(--grey);font-size:13px;max-width:880px}
+  .intro b{color:var(--ink)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding:16px 22px 30px;max-width:1280px;margin:0 auto}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;page-break-inside:avoid}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .card .name{font-weight:900;font-size:16px;line-height:1.2}
+  .card .cat{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--pink);border-radius:999px;padding:3px 9px;font-weight:800;white-space:nowrap}
+  .card .badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .card .badge{font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;background:#f0f0f2;color:var(--ink)}
+  .card .badge.time{background:var(--lime);color:var(--ink)}
+  .card .sec{margin-top:10px}
+  .card .lab{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:800;margin-bottom:2px}
+  .card .txt{font-size:13px;line-height:1.45}
+  .card .txt.pts{font-weight:600}
+
+  .empty{padding:30px 22px;color:var(--grey);text-align:center}
+
+  footer.app{text-align:center;color:var(--grey);font-size:12px;padding:18px}
+  footer.app b{color:var(--pink)}
+
+  @media(max-width:680px){
+    input{font-size:16px}
+    header.app{padding:12px 16px;gap:10px}
+    header.app .logo{font-size:22px}
+    .toolbar,.chips,.intro,.grid{padding-left:14px;padding-right:14px}
+    .grid{grid-template-columns:1fr}
+  }
+
+  @media print{
+    .toolbar,.chips,.intro{display:none!important}
+    body{background:#fff}
+    header.app{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .grid{display:block;padding:0;max-width:none}
+    .card{border:none;border-bottom:1px solid #ccc;border-radius:0;padding:10px 0}
+    .card .cat,.card .badge.time{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="logo">SLAAM</div>
+  <div>
+    <div style="font-weight:800;font-size:15px;line-height:1">Drill Library</div>
+    <div class="tag">No Lazy Drills. We Develop Them.</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="by">Powered by <b>NextEdge</b></div>
+</header>
+
+<div class="toolbar">
+  <input class="search" id="search" placeholder="Search drills, categories, coaching points…" oninput="render()"/>
+  <span class="count" id="count"></span>
+  <div style="flex:1"></div>
+  <a class="back" href="index.html">← Practice Planner</a>
+  <button class="print" onclick="window.print()">🖨 Print / PDF</button>
+</div>
+
+<div class="chips" id="chips"></div>
+
+<p class="intro">
+  The shared SLAAM drill bank — <b>this is the SLAAM way</b>. Every drill has its purpose, setup, and coaching points so any coach in the program can run it the same way.
+  Use it to plan in the <a href="index.html">Practice Planner</a>, or print it and hand it to a new coach.
+</p>
+
+<div class="grid" id="grid"></div>
+
+<footer class="app">SLAAM Basketball · Pittsburgh, PA · @SLAAMBASKETBALL — Powered by <b>NextEdge</b></footer>
+
+<script>
+const DRILLS = [
+  {name:"Dynamic Warm-Up Series",category:"Warm-Up",minutes:8,age:"All",
+   purpose:"Get bodies ready and set the tone — practice starts the second you step on the floor.",
+   setup:"Baseline to half-court and back: high knees, butt kicks, walking lunges, open/close gates, build-up sprints.",
+   points:"Full effort, sharp lines, no walking. We warm up loud."},
+  {name:"3-Man Weave + Finish",category:"Warm-Up",minutes:6,age:"All",
+   purpose:"Conditioning plus passing on the move into a live finish.",
+   setup:"Three lines on the baseline; weave to the rim and finish the layup, defender chases on the return.",
+   points:"Sprint the lanes, crisp passes, finish through contact."},
+  {name:"Partner Passing Series",category:"Warm-Up",minutes:5,age:"Youth-friendly",
+   purpose:"Clean, fast, game-speed passing — chest, bounce, overhead, one-hand push.",
+   setup:"Partners 12–15 ft apart, cycle through each pass type for reps.",
+   points:"Step into every pass, target the hands, no lazy lobs."},
+  {name:"Two-Ball Dribble Series",category:"Ball-Handling",minutes:8,age:"All",
+   purpose:"Build both hands and ball control under fatigue.",
+   setup:"Each player two balls: pound, alternating, crossovers, in-and-out — stationary then on the move.",
+   points:"Eyes up, pound the dribble, stay low. Both hands equal reps."},
+  {name:"Stationary Pound & Glove Series",category:"Ball-Handling",minutes:6,age:"Youth-friendly",
+   purpose:"Hand strength and a confident handle for younger players.",
+   setup:"Pound dribbles, figure-8s, wraps, and V-dribbles at each station.",
+   points:"Fingertips not palm, hard dribbles, head up."},
+  {name:"Full-Court Move Series",category:"Ball-Handling",minutes:8,age:"MS & up",
+   purpose:"Rep attack moves at game speed, end to end.",
+   setup:"Up and back working one move per trip: crossover, between, behind, hesitation, in-and-out.",
+   points:"Sell the move, change speeds, finish every trip."},
+  {name:"Pressure Keep-Away (1v1)",category:"Ball-Handling",minutes:6,age:"MS & up",
+   purpose:"Protect the ball against real on-ball pressure.",
+   setup:"1v1 in a 10x10 box; offense keeps the dribble alive for 15 seconds, then swap.",
+   points:"Body between ball and defender, chin the steals, stay composed."},
+  {name:"Mikan + Reverse Mikan",category:"Finishing",minutes:6,age:"All",
+   purpose:"Footwork, timing, and soft touch at the rim with both hands.",
+   setup:"Continuous layups under the basket alternating sides, then reverse layups.",
+   points:"Soft touch off glass, finish both sides, no rushing."},
+  {name:"Finish Through Contact",category:"Finishing",minutes:8,age:"MS & up",
+   purpose:"Stay strong and finish when she gets hit.",
+   setup:"A coach or manager with a pad contests every drive to the rim.",
+   points:"Absorb contact, strong base, expect the foul and finish."},
+  {name:"Euro & Floater Progression",category:"Finishing",minutes:6,age:"MS & up",
+   purpose:"Add counters for help defense and shot-blockers.",
+   setup:"Attack from the wing or middle, read the help, then euro-step or floater.",
+   points:"Read on the catch, change pace, finish over not into."},
+  {name:"Transition Layup Lines",category:"Finishing",minutes:5,age:"Youth-friendly",
+   purpose:"Full-speed finishes on both hands.",
+   setup:"Two lines, outlet pass, fill the lane — right hand, then left hand.",
+   points:"Sprint wide, finish high, opposite hand opposite side."},
+  {name:"Form Shooting → Spot-Up",category:"Shooting",minutes:10,age:"All",
+   purpose:"Groove clean mechanics, then extend to game spots.",
+   setup:"Close-range form makes, then move to 5 spots for spot-up reps. Count makes.",
+   points:"Feet set, hold the follow-through, game pace on the catch."},
+  {name:"Catch-and-Shoot off the Pass",category:"Shooting",minutes:8,age:"MS & up",
+   purpose:"Be ready to shoot before the ball arrives.",
+   setup:"Passer feeds a shooter cutting to spots; shooter is on balance into the catch.",
+   points:"Hands ready, hop into the catch, no dip — up quick."},
+  {name:"Pull-Up Series",category:"Shooting",minutes:8,age:"MS & up",
+   purpose:"Score off the dribble when the close-out runs you off the line.",
+   setup:"One or two dribbles into a pull-up from the elbows and wings.",
+   points:"Gather on balance, rise straight up, hold it."},
+  {name:"5-Spot Shooting (vs the Clock)",category:"Competition",minutes:8,age:"All",
+   purpose:"Make shots while tired and competing.",
+   setup:"Make a shot at each of 5 spots; race the clock or a partner.",
+   points:"Compete every rep. Loud makes count. Finish strong."},
+  {name:"Free Throws — Game Pressure",category:"Conditioning",minutes:6,age:"All",
+   purpose:"Make free throws tired, like the 4th quarter.",
+   setup:"Shoot a 1-and-1 after a sprint; a miss = the team runs.",
+   points:"Same routine every time. Make FTs tired. We don't fold."},
+  {name:"Transition 2v1 / 3v2",category:"Offense",minutes:10,age:"All",
+   purpose:"Make the right read and finish the fast break.",
+   setup:"Advantage break the other way; finish in two passes or fewer.",
+   points:"Run wide, sprint to spots, read the defender, finish."},
+  {name:"Pick-and-Roll Reads",category:"Offense",minutes:10,age:"MS & up",
+   purpose:"Teach the program's ball-screen reads.",
+   setup:"2v2 ball screen: read drop, hedge, and switch — pocket pass, pull-up, or reject.",
+   points:"Use the screen shoulder-to-hip, read the big, make the simple play."},
+  {name:"5-on-0 Flow / Motion",category:"Offense",minutes:8,age:"MS & up",
+   purpose:"Rep the SLAAM offense until spacing and cuts are automatic.",
+   setup:"Run the base offense full speed with no defense, then add a dummy defender.",
+   points:"Space the floor, cut hard, talk the actions out loud."},
+  {name:"Give-and-Go / Backdoor",category:"Offense",minutes:6,age:"Youth-friendly",
+   purpose:"Reward hard cuts and unselfish passing.",
+   setup:"Pass and cut to the rim; read the defender for the cut vs the backdoor.",
+   points:"Pass and move — never stand. Cut to score, not to clear."},
+  {name:"Defensive Slides / Zig-Zag",category:"Defense",minutes:6,age:"All",
+   purpose:"Build a low, fast, disciplined stance.",
+   setup:"Zig-zag up the floor in a stance, changing direction on the lines.",
+   points:"Stay low, push off the back foot, don't cross your feet."},
+  {name:"Closeout 1v1",category:"Defense",minutes:8,age:"All",
+   purpose:"Contest without fouling and force her to your help.",
+   setup:"Defender closes out to the wing and plays live 1v1.",
+   points:"Sprint-to-breakdown, high hands, force baseline, contest — no foul."},
+  {name:"On-Ball Pressure & Deny",category:"Defense",minutes:6,age:"MS & up",
+   purpose:"Make every catch and dribble hard.",
+   setup:"Pressure the ball-handler and deny the wing one pass away.",
+   points:"Nose on the ball, hand in the passing lane, talk."},
+  {name:"Shell Defense (4v4)",category:"Defense",minutes:12,age:"All",
+   purpose:"Team defense — help, recover, and communicate.",
+   setup:"4v4 on the perimeter working jump-to-ball, help, and close-out. No middle.",
+   points:"Talk every action, jump to the ball, help and recover. No middle."},
+  {name:"Box-Out War",category:"Rebounding",minutes:6,age:"All",
+   purpose:"Win the possession — rebounding is effort, not height.",
+   setup:"Coach shoots; players find a body, box out, and go get it. Score by rebounds.",
+   points:"Hit first, find a body, chin the ball, two hands. Be unbreakable."},
+  {name:"3v3 Small-Sided — Live",category:"Competition",minutes:14,age:"All",
+   purpose:"Compete and apply skills in live reps.",
+   setup:"Half-court 3v3, make-it-take-it, win by 2. Rotate teams.",
+   points:"Score it. Win the possession. No easy buckets."},
+  {name:"1v1 from the Wing",category:"Competition",minutes:8,age:"MS & up",
+   purpose:"Create and stop a bucket one-on-one.",
+   setup:"Live 1v1 from the wing with limited dribbles; switch off a make or a stop.",
+   points:"Attack a shoulder, finish or get fouled — on defense, make her earn it."},
+  {name:"BLOB / SLOB Sets",category:"Situational",minutes:8,age:"MS & up",
+   purpose:"Know the inbounds sets cold so they're automatic in games.",
+   setup:"Walk through, then run the program's baseline/sideline sets vs defense.",
+   points:"Know the set, screen with purpose, get a layup or open three."},
+  {name:"Late-Game Situations",category:"Situational",minutes:6,age:"MS & up",
+   purpose:"Rehearse score-and-foul, last shot, and protecting a lead.",
+   setup:"Put a score and a clock up; run the situation live at both ends.",
+   points:"Know the situation, value every possession, execute under pressure."},
+  {name:"Compete-to-Close",category:"Conditioning",minutes:6,age:"All",
+   purpose:"End every practice loud, tired, and together.",
+   setup:"Sprints into pressure free throws; the team finishes as one.",
+   points:"Finish strong. Loud, fearless, unbreakable."},
+];
+
+const CATS = ["All", ...Array.from(new Set(DRILLS.map(d=>d.category)))];
+let activeCat = "All";
+
+function esc(s){return (s==null?"":String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderChips(){
+  const box=document.getElementById('chips'); box.innerHTML='';
+  CATS.forEach(c=>{
+    const b=document.createElement('span');
+    b.className='chip'+(c===activeCat?' on':'');
+    b.textContent=c;
+    b.onclick=()=>{ activeCat=c; renderChips(); render(); };
+    box.appendChild(b);
+  });
+}
+
+function render(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const grid=document.getElementById('grid'); grid.innerHTML='';
+  const list=DRILLS.filter(d=>{
+    if(activeCat!=="All" && d.category!==activeCat) return false;
+    if(!q) return true;
+    return (d.name+' '+d.category+' '+d.purpose+' '+d.setup+' '+d.points).toLowerCase().includes(q);
+  });
+  document.getElementById('count').textContent = list.length+" of "+DRILLS.length+" drills";
+  if(!list.length){ grid.innerHTML='<div class="empty">No drills match that search.</div>'; return; }
+  list.forEach(d=>{
+    const el=document.createElement('div'); el.className='card';
+    el.innerHTML=`
+      <div class="top"><div class="name">${esc(d.name)}</div><span class="cat">${esc(d.category)}</span></div>
+      <div class="badges"><span class="badge time">${d.minutes} min</span><span class="badge">${esc(d.age)}</span></div>
+      <div class="sec"><div class="lab">Purpose</div><div class="txt">${esc(d.purpose)}</div></div>
+      <div class="sec"><div class="lab">Setup</div><div class="txt">${esc(d.setup)}</div></div>
+      <div class="sec"><div class="lab">Coaching Points</div><div class="txt pts">${esc(d.points)}</div></div>`;
+    grid.appendChild(el);
+  });
+}
+
+renderChips();
+render();
+</script>
+</body>
+</html>
