@@ -10,7 +10,7 @@
     --grey:#6b6b6b; --line:#e6e6e6; --bg:#f6f6f7; --white:#fff;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  body{margin:0;font-family:-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
   button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-weight:700}
   input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%;background:#fff}
   textarea{resize:vertical;min-height:34px}
@@ -103,6 +103,41 @@
   footer.app b{color:var(--pink)}
   .hint{font-size:11px;color:var(--grey);margin-top:4px}
 
+  /* ---------- mobile / iPhone ---------- */
+  @media(max-width:680px){
+    input,select,textarea{font-size:16px}      /* 16px = no iOS auto-zoom on focus */
+    header.app{padding:12px 16px;gap:10px}
+    header.app .logo{font-size:22px}
+    .toolbar{padding:9px 14px;gap:7px}
+    .toolbar select{min-width:0;flex:1 1 130px}
+    .toolbar label{width:100%}
+    .wrap{padding:14px;gap:14px}
+    .card{padding:13px}
+
+    /* segments table -> stacked cards */
+    table.blocks thead{display:none}
+    table.blocks,table.blocks tbody{display:block;width:100%}
+    table.blocks tr.seg-main{display:block;border:1px solid var(--line);border-radius:12px;
+      padding:10px 12px;margin-bottom:12px;background:#fff}
+    table.blocks tr.seg-main.drop-on td{background:transparent}
+    table.blocks td{display:block;width:100%;border-top:none;padding:6px 0}
+    table.blocks td[data-label]::before{content:attr(data-label);display:block;font-size:10px;
+      text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:800;margin-bottom:3px}
+    table.blocks td.clock-cell{display:inline-block;width:46%;vertical-align:top;text-align:left;font-size:18px}
+    table.blocks td.min-td{display:inline-block;width:52%;vertical-align:top}
+    .min-in{width:100%}
+    .btns-td .rowbtns{gap:8px;margin-top:4px}
+    .btns-td .rowbtns button{width:46px;height:46px;font-size:18px}
+    td.detail-cell{display:block;width:100%;padding:0 0 10px}
+
+    /* drill library: clear, finger-sized add target */
+    .drill{padding:11px 12px}
+    .drill .dn{font-size:14px}
+    .drill .dadd{font-size:14px;font-weight:800;border:1px solid var(--pink);border-radius:8px;
+      text-align:center;padding:9px 0;margin-top:8px}
+    .total{justify-content:space-between;flex-wrap:wrap}
+  }
+
   @media print{
     .toolbar,.lib,.add-block,.rowbtns,.focus .chip:not(.on),.no-print,.newdrill,.drill-search,.attachzone,.detail .opts{display:none!important}
     body{background:#fff}
@@ -164,7 +199,7 @@
     </div>
 
     <div class="card" style="margin-top:16px">
-      <h2>Practice Segments <span class="mini" style="text-transform:none;color:var(--grey)">— drag a drill onto a row · tap ⋯ for notes, attachments, or a draw box</span></h2>
+      <h2>Practice Segments <span class="mini" style="text-transform:none;color:var(--grey)">— tap ＋ on a drill to add it (or drag, on a laptop) · tap ⋯ for notes &amp; sketches</span></h2>
       <table class="blocks">
         <thead>
           <tr><th style="width:62px">Clock</th><th style="width:46px">Min</th><th style="width:26%">Segment</th><th>Drill / Focus</th><th>Coaching Points</th><th style="width:92px"></th></tr>
@@ -173,7 +208,7 @@
       </table>
       <div class="add-block">
         <button onclick="addSegment()">＋ Add segment</button>
-        <span class="hint">Tip: drag drills from the library →</span>
+        <span class="hint">Tip: open the Drill Library below and tap ＋ on any drill</span>
       </div>
       <div class="total"><span>Total:</span><span class="pill" id="totalPill">0 min</span><span class="endnote" id="endNote" style="color:var(--grey);font-size:13px"></span></div>
     </div>
@@ -278,12 +313,12 @@ function renderSegments(){
     tr.ondragleave=()=>tr.classList.remove('drop-on');
     tr.ondrop=e=>{e.preventDefault();tr.classList.remove('drop-on');dropDrill(e,i);};
     tr.innerHTML=`
-      <td class="clock-cell">${clock}</td>
-      <td><input class="min-in" type="number" value="${b.minutes||0}" onchange="setSeg(${i},'minutes',this.value*1);renderSegments()"></td>
-      <td><input value="${esc(b.label)}" oninput="setSeg(${i},'label',this.value)"></td>
-      <td><input value="${esc(b.drill)}" oninput="setSeg(${i},'drill',this.value)" placeholder="drill name / focus"></td>
-      <td><textarea oninput="setSeg(${i},'points',this.value)" placeholder="coaching points">${esc(b.points)}</textarea></td>
-      <td><div class="rowbtns">
+      <td class="clock-cell" data-label="Clock">${clock}</td>
+      <td class="min-td" data-label="Min"><input class="min-in" type="number" value="${b.minutes||0}" onchange="setSeg(${i},'minutes',this.value*1);renderSegments()"></td>
+      <td data-label="Segment"><input value="${esc(b.label)}" oninput="setSeg(${i},'label',this.value)"></td>
+      <td data-label="Drill / Focus"><input value="${esc(b.drill)}" oninput="setSeg(${i},'drill',this.value)" placeholder="drill name / focus"></td>
+      <td data-label="Coaching Points"><textarea oninput="setSeg(${i},'points',this.value)" placeholder="coaching points">${esc(b.points)}</textarea></td>
+      <td class="btns-td"><div class="rowbtns">
         <button class="exp${b.open?' on':''}" title="notes / attach / draw" onclick="toggleSeg(${i})">⋯</button>
         <button title="up" onclick="moveSeg(${i},-1)">▲</button>
         <button title="down" onclick="moveSeg(${i},1)">▼</button>
