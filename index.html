@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SLAAM Practice Planner — Powered by NextEdge</title>
+<style>
+  :root{
+    --pink:#FF2D8E; --pink-soft:#FFEAF4; --lime:#C6FF1A; --ink:#141414;
+    --grey:#6b6b6b; --line:#e6e6e6; --bg:#f6f6f7; --white:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-weight:700}
+  input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%;background:#fff}
+  textarea{resize:vertical;min-height:34px}
+
+  header.app{background:var(--pink);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:16px}
+  header.app .logo{font-size:26px;font-weight:900;letter-spacing:.5px}
+  header.app .tag{color:var(--lime);font-weight:800;text-transform:uppercase;font-size:12px;letter-spacing:1px}
+  header.app .spacer{flex:1}
+  header.app .by{font-size:12px;opacity:.95}
+  header.app .by b{color:var(--lime)}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px 22px;background:#fff;border-bottom:1px solid var(--line);align-items:center}
+  .toolbar button{padding:8px 12px;font-size:13px;background:#f0f0f2;color:var(--ink)}
+  .toolbar button.primary{background:var(--pink);color:#fff}
+  .toolbar button.ghost{background:#fff;border:1px solid var(--line)}
+  .toolbar .grow{flex:1}
+  .toolbar select{width:auto;min-width:180px}
+  .toolbar label{font-size:12px;color:var(--grey);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+
+  .wrap{display:grid;grid-template-columns:1fr 320px;gap:18px;padding:18px 22px;max-width:1280px;margin:0 auto}
+  @media(max-width:960px){.wrap{grid-template-columns:1fr}}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .card h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--pink);
+           border-bottom:2px solid var(--lime);padding-bottom:6px}
+
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:680px){.meta{grid-template-columns:1fr 1fr}}
+  .meta .f label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:700;margin-bottom:3px}
+
+  .focus{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}
+  .focus .lab{font-size:11px;text-transform:uppercase;color:var(--grey);font-weight:800;letter-spacing:.5px}
+  .chip{padding:5px 11px;border-radius:999px;border:1.5px solid var(--line);font-size:12px;font-weight:700;background:#fff;color:var(--grey)}
+  .chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+
+  table.blocks{width:100%;border-collapse:collapse;margin-top:4px}
+  table.blocks th{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);text-align:left;padding:4px 6px}
+  table.blocks td{padding:4px 6px;vertical-align:top;border-top:1px solid var(--line)}
+  table.blocks tr.seg-main.drop-on td{background:var(--pink-soft)}
+  .min-in{width:60px;text-align:center}
+  .rowbtns{display:flex;gap:3px;flex-wrap:wrap}
+  .rowbtns button{background:#f0f0f2;width:26px;height:26px;font-size:13px;line-height:1;color:var(--grey);padding:0}
+  .rowbtns button.del:hover{background:#ffdeee;color:var(--pink)}
+  .rowbtns button.exp.on{background:var(--lime);color:var(--ink)}
+
+  /* per-segment detail panel */
+  td.detail-cell{padding:0 6px 10px}
+  .detail{background:#fafafa;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:2px}
+  .detail .dlabel{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:800;margin-bottom:4px}
+  .detail textarea{background:#fff;min-height:46px;margin-bottom:8px}
+  .attachzone{border:1.5px dashed var(--line);border-radius:8px;padding:10px;text-align:center;color:var(--grey);font-size:12px;background:#fff;cursor:pointer}
+  .attachzone.drag{border-color:var(--pink);background:var(--pink-soft);color:var(--pink)}
+  .attach-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;margin-top:6px}
+  .attach-chip a{color:var(--pink);font-weight:800;text-decoration:none}
+  .attach-chip button{background:#f0f0f2;border-radius:6px;width:22px;height:22px;color:var(--grey);padding:0}
+  .attach-img{max-width:100%;border:1px solid var(--line);border-radius:8px;margin-top:6px}
+  .detail .opts{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--ink)}
+  .detail .opts input{width:auto}
+  .drawbox{border:1.5px solid #bbb;border-radius:8px;height:130px;margin-top:8px;background:repeating-linear-gradient(0deg,#fff,#fff 22px,#f4f4f4 22px,#f4f4f4 23px)}
+  .drawbox .dl{font-size:10px;color:#aaa;padding:4px 8px;text-transform:uppercase;letter-spacing:.5px}
+
+  .add-block{margin-top:10px;display:flex;gap:8px;align-items:center}
+  .add-block button{background:var(--lime);color:var(--ink);padding:8px 12px;font-size:13px}
+  .total{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin-top:12px;font-weight:800}
+  .total .pill{background:var(--ink);color:#fff;border-radius:999px;padding:5px 14px}
+  .total .pill.over{background:var(--pink)}
+  .total .pill.exact{background:#1a9e4b}
+
+  .drill-search{margin-bottom:10px}
+  .drill{border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;cursor:grab;background:#fff}
+  .drill:active{cursor:grabbing}
+  .drill .dh{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .drill .dn{font-weight:800;font-size:13px}
+  .drill .cat{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--pink);border-radius:999px;padding:2px 7px;font-weight:800}
+  .drill .dm{font-size:11px;color:var(--grey);margin-top:3px}
+  .drill .dpts{font-size:11px;color:var(--ink);margin-top:4px;display:none}
+  .drill.open .dpts{display:block}
+  .drill img.thumb{max-width:100%;border-radius:6px;margin-top:6px;border:1px solid var(--line);display:none}
+  .drill.open img.thumb{display:block}
+  .drill .dadd{font-size:11px;color:var(--pink);font-weight:800;margin-top:6px;cursor:pointer}
+
+  .newdrill{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:none}
+  .newdrill.open{display:block}
+  .newdrill input,.newdrill textarea,.newdrill select{margin-bottom:6px}
+  .newdrill .row2{display:grid;grid-template-columns:1fr 80px;gap:6px}
+  .mini{font-size:11px;color:var(--grey)}
+
+  footer.app{text-align:center;color:var(--grey);font-size:12px;padding:16px}
+  footer.app b{color:var(--pink)}
+  .hint{font-size:11px;color:var(--grey);margin-top:4px}
+
+  @media print{
+    .toolbar,.lib,.add-block,.rowbtns,.focus .chip:not(.on),.no-print,.newdrill,.drill-search,.attachzone,.detail .opts{display:none!important}
+    body{background:#fff}
+    .wrap{display:block;padding:0;max-width:none}
+    .card{border:none;padding:0;page-break-inside:avoid}
+    header.app{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    table.blocks td{border-top:1px solid #bbb}
+    .chip.on,.drawbox{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .detail{background:#fff;border:none;padding:0}
+  }
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="logo">SLAAM</div>
+  <div>
+    <div style="font-weight:800;font-size:15px;line-height:1">Practice Planner</div>
+    <div class="tag">Built Different. Play Different.</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="by no-print">Powered by <b>NextEdge</b></div>
+</header>
+
+<div class="toolbar no-print">
+  <button class="primary" onclick="newPlan()">＋ New</button>
+  <label for="tmpl">Template</label>
+  <select id="tmpl" onchange="applyTemplate(this.value)">
+    <option value="">— start from a template —</option>
+  </select>
+  <button class="ghost" onclick="saveAsTemplate()">★ Save as template</button>
+  <span style="width:1px;height:22px;background:var(--line)"></span>
+  <button class="ghost" onclick="savePlan()">💾 Save plan</button>
+  <label for="saved">My Plans</label>
+  <select id="saved" onchange="loadPlan(this.value)">
+    <option value="">— saved plans —</option>
+  </select>
+  <button class="ghost" onclick="deleteSaved()">🗑 Delete</button>
+  <div class="grow"></div>
+  <button class="ghost" onclick="exportJSON()">⤓ Export</button>
+  <button class="ghost" onclick="document.getElementById('imp').click()">⤒ Import</button>
+  <input type="file" id="imp" accept="application/json" style="display:none" onchange="importJSON(event)" />
+  <button onclick="window.print()">🖨 Print / PDF</button>
+</div>
+
+<div class="wrap">
+  <div>
+    <div class="card">
+      <h2>Practice Details</h2>
+      <div class="meta">
+        <div class="f"><label>Team / Age</label><input id="m_team" oninput="touch()" placeholder="e.g. 14U Power 24"/></div>
+        <div class="f"><label>Date</label><input id="m_date" type="date" oninput="touch()"/></div>
+        <div class="f"><label>Duration (min)</label><input id="m_dur" type="number" value="90" oninput="touch();renderTotal()"/></div>
+        <div class="f"><label>Coach</label><input id="m_coach" oninput="touch()"/></div>
+        <div class="f"><label>Location</label><input id="m_loc" oninput="touch()"/></div>
+        <div class="f"><label>Theme of the Day</label><input id="m_theme" oninput="touch()" placeholder="e.g. Transition defense"/></div>
+      </div>
+      <div class="focus" id="focusRow"><span class="lab">SLAAM Focus:</span></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Practice Segments <span class="mini" style="text-transform:none;color:var(--grey)">— drag a drill onto a row · tap ⋯ for notes, attachments, or a draw box</span></h2>
+      <table class="blocks">
+        <thead>
+          <tr><th style="width:46px">Min</th><th style="width:28%">Segment</th><th>Drill / Focus</th><th>Coaching Points</th><th style="width:92px"></th></tr>
+        </thead>
+        <tbody id="blockBody"></tbody>
+      </table>
+      <div class="add-block">
+        <button onclick="addSegment()">＋ Add segment</button>
+        <span class="hint">Tip: drag drills from the library →</span>
+      </div>
+      <div class="total"><span>Total:</span><span class="pill" id="totalPill">0 min</span></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>What Got Better Today</h2>
+      <textarea id="m_notes" oninput="touch()" placeholder="Coach note after practice — what we worked on, what improved, who stood out…" style="min-height:60px"></textarea>
+    </div>
+  </div>
+
+  <div class="lib">
+    <div class="card">
+      <h2>Drill Library</h2>
+      <input class="drill-search" id="drillSearch" placeholder="Search drills…" oninput="renderDrills()"/>
+      <div id="drillList"></div>
+      <button class="ghost" style="width:100%;border:1px dashed var(--line);padding:9px" onclick="toggleNewDrill()">＋ Add a drill you drew up</button>
+      <div class="newdrill" id="newDrill">
+        <input id="nd_name" placeholder="Drill name"/>
+        <div class="row2">
+          <select id="nd_cat">
+            <option>Skill</option><option>Shooting</option><option>Finishing</option>
+            <option>Ball-Handling</option><option>Defense</option><option>Offense</option>
+            <option>Competition</option><option>Conditioning</option><option>Warm-Up</option><option>Situational</option>
+          </select>
+          <input id="nd_min" type="number" placeholder="min" value="8"/>
+        </div>
+        <textarea id="nd_pts" placeholder="Coaching points…"></textarea>
+        <label class="mini">Diagram you drew up (image, optional):</label>
+        <input type="file" id="nd_img" accept="image/*"/>
+        <button class="primary" style="width:100%;padding:9px;margin-top:6px" onclick="saveNewDrill()">Save drill to library</button>
+        <div class="hint">Saved drills stay in this browser. In the NextEdge Playbook version, drills = diagrams you draw in the play editor.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="app">SLAAM Basketball · Pittsburgh, PA · @SLAAMBASKETBALL — Powered by <b>NextEdge</b></footer>
+
+<script>
+/* =========================================================
+   DATA MODEL  (maps to the Playbook port: Drill / Plan / Folder)
+   segment = {label, minutes, drill, points, detail, attach{name,type,data}|null, drawBox, open}
+   plan    = {team,date,duration,coach,location,theme,focus[],segments[],notes}
+   ========================================================= */
+const FOCUS_OPTIONS = ["Skill","Competition","Team Offense","Team Defense","Culture"];
+
+// ONE starter template. Coaches build their own via "Save as template".
+const DEFAULT_TEMPLATE = [
+  ["Dynamic Warm-Up",8],["Skill Development",15],["Competition / Small-Sided",18],
+  ["Team Offense",12],["Team Defense",12],["Compete-to-Close",10],["Cool-Down & Message",6],
+];
+
+const SEED_DRILLS = [
+  {name:"3-Man Weave + Finish",category:"Warm-Up",minutes:6,coachingPoints:"Sprint the lanes, crisp passes, finish through contact. No walking."},
+  {name:"Two-Ball Dribble Series",category:"Ball-Handling",minutes:8,coachingPoints:"Eyes up, pound the dribble, stay low. Both hands equal reps."},
+  {name:"Mikan + Reverse Mikan",category:"Finishing",minutes:6,coachingPoints:"Soft touch off glass, footwork timing, finish both sides."},
+  {name:"Form Shooting → Spot-Up",category:"Shooting",minutes:10,coachingPoints:"Feet set, hold follow-through, game pace on catch. Count makes."},
+  {name:"Closeout 1v1",category:"Defense",minutes:8,coachingPoints:"Sprint-to-breakdown, high hands, force baseline, contest no foul."},
+  {name:"Shell Defense (4v4)",category:"Defense",minutes:12,coachingPoints:"Talk, jump-to-ball, help & recover. No middle penetration."},
+  {name:"3v3 Small-Sided — Live",category:"Competition",minutes:14,coachingPoints:"Score it. Win the possession. Compete every rep, no easy buckets."},
+  {name:"Transition 2v1 / 3v2",category:"Offense",minutes:10,coachingPoints:"Run wide, sprint to spots, make the read, finish in 2 passes."},
+  {name:"BLOB / SLOB Sets",category:"Situational",minutes:8,coachingPoints:"Know the set, screen with purpose, get a layup or open three."},
+  {name:"Compete-to-Close (sprints+FTs)",category:"Conditioning",minutes:6,coachingPoints:"Finish strong. Make FTs tired. Loud, fearless, unbreakable."},
+];
+
+let state = { plan: blankPlan(), customDrills: load("slaam_custom_drills", []), dirty:false };
+
+function blankPlan(){
+  return { team:"",date:"",duration:90,coach:"",location:"",theme:"",focus:[],
+           segments: DEFAULT_TEMPLATE.map(([label,minutes])=>seg(label,minutes)),
+           notes:"" };
+}
+function seg(label,minutes,drill,points){ return {label:label||"",minutes:minutes||0,drill:drill||"",points:points||"",detail:"",attach:null,drawBox:false,open:false}; }
+
+function load(k,d){ try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d} }
+function store(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){alert("Storage full — large attachments (especially PDFs) can exceed the browser limit. Try a smaller file or remove one.");} }
+function touch(){ state.dirty=true; }
+
+/* ---------- render ---------- */
+function renderFocus(){
+  const row=document.getElementById('focusRow');
+  row.querySelectorAll('.chip').forEach(c=>c.remove());
+  FOCUS_OPTIONS.forEach(f=>{
+    const b=document.createElement('span');
+    b.className='chip'+(state.plan.focus.includes(f)?' on':'');
+    b.textContent=f;
+    b.onclick=()=>{ const i=state.plan.focus.indexOf(f); i>=0?state.plan.focus.splice(i,1):state.plan.focus.push(f); touch(); renderFocus(); };
+    row.appendChild(b);
+  });
+}
+
+function renderSegments(){
+  const body=document.getElementById('blockBody'); body.innerHTML='';
+  state.plan.segments.forEach((b,i)=>{
+    const tr=document.createElement('tr');
+    tr.className='seg-main';
+    tr.ondragover=e=>{e.preventDefault();tr.classList.add('drop-on');};
+    tr.ondragleave=()=>tr.classList.remove('drop-on');
+    tr.ondrop=e=>{e.preventDefault();tr.classList.remove('drop-on');dropDrill(e,i);};
+    tr.innerHTML=`
+      <td><input class="min-in" type="number" value="${b.minutes||0}" onchange="setSeg(${i},'minutes',this.value*1);renderTotal()"></td>
+      <td><input value="${esc(b.label)}" oninput="setSeg(${i},'label',this.value)"></td>
+      <td><input value="${esc(b.drill)}" oninput="setSeg(${i},'drill',this.value)" placeholder="drill name / focus"></td>
+      <td><textarea oninput="setSeg(${i},'points',this.value)" placeholder="coaching points">${esc(b.points)}</textarea></td>
+      <td><div class="rowbtns">
+        <button class="exp${b.open?' on':''}" title="notes / attach / draw" onclick="toggleSeg(${i})">⋯</button>
+        <button title="up" onclick="moveSeg(${i},-1)">▲</button>
+        <button title="down" onclick="moveSeg(${i},1)">▼</button>
+        <button class="del" title="remove" onclick="removeSeg(${i})">✕</button>
+      </div></td>`;
+    body.appendChild(tr);
+
+    const show = b.open || b.detail || b.attach || b.drawBox;
+    if(show){
+      const dr=document.createElement('tr');
+      const td=document.createElement('td');
+      td.colSpan=5; td.className='detail-cell';
+      td.appendChild(buildDetail(b,i));
+      dr.appendChild(td); body.appendChild(dr);
+    }
+  });
+  renderTotal();
+}
+
+function buildDetail(b,i){
+  const wrap=document.createElement('div'); wrap.className='detail';
+  // free text
+  const lab=document.createElement('div'); lab.className='dlabel'; lab.textContent='Notes — teams, extra items, reminders'; wrap.appendChild(lab);
+  const ta=document.createElement('textarea'); ta.value=b.detail||''; ta.placeholder='e.g. Teams: White = Maya/Jordan/… · Add: 5 min free throws';
+  ta.oninput=()=>setSeg(i,'detail',ta.value); wrap.appendChild(ta);
+  // attachment
+  if(b.attach){
+    if(b.attach.type && b.attach.type.indexOf('image')===0){
+      const img=document.createElement('img'); img.className='attach-img'; img.src=b.attach.data; wrap.appendChild(img);
+    }
+    const chip=document.createElement('div'); chip.className='attach-chip';
+    chip.innerHTML=`<a href="${b.attach.data}" target="_blank">📎 ${esc(b.attach.name)}</a>`;
+    const rm=document.createElement('button'); rm.textContent='✕'; rm.title='remove attachment';
+    rm.onclick=()=>{ b.attach=null; touch(); renderSegments(); };
+    chip.appendChild(rm); wrap.appendChild(chip);
+  } else {
+    const zone=document.createElement('div'); zone.className='attachzone';
+    zone.textContent='Drop a PDF or image here, or click to attach';
+    zone.onclick=()=>pickFile(i);
+    zone.ondragover=e=>{e.preventDefault();zone.classList.add('drag');};
+    zone.ondragleave=()=>zone.classList.remove('drag');
+    zone.ondrop=e=>{e.preventDefault();zone.classList.remove('drag'); if(e.dataTransfer.files[0]) attachFile(i,e.dataTransfer.files[0]);};
+    wrap.appendChild(zone);
+  }
+  // draw box toggle
+  const opts=document.createElement('label'); opts.className='opts';
+  const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!b.drawBox;
+  cb.onchange=()=>{ setSeg(i,'drawBox',cb.checked); renderSegments(); };
+  opts.appendChild(cb); opts.appendChild(document.createTextNode('Add a blank draw box (prints empty to sketch the play by hand)'));
+  wrap.appendChild(opts);
+  if(b.drawBox){
+    const box=document.createElement('div'); box.className='drawbox';
+    box.innerHTML='<div class="dl">Draw it up</div>'; wrap.appendChild(box);
+  }
+  return wrap;
+}
+
+function renderTotal(){
+  const sum=state.plan.segments.reduce((a,b)=>a+(+b.minutes||0),0);
+  const target=+document.getElementById('m_dur').value||+state.plan.duration||0;
+  const pill=document.getElementById('totalPill');
+  pill.textContent=sum+' min'+(target?` / ${target}`:'');
+  pill.className='pill'+(sum>target&&target?' over':(sum===target&&target?' exact':''));
+}
+
+function renderDrills(){
+  const q=(document.getElementById('drillSearch').value||'').toLowerCase();
+  const all=[...state.customDrills,...SEED_DRILLS];
+  const list=document.getElementById('drillList'); list.innerHTML='';
+  all.filter(d=>!q||d.name.toLowerCase().includes(q)||d.category.toLowerCase().includes(q)).forEach(d=>{
+    const el=document.createElement('div');
+    el.className='drill'; el.draggable=true;
+    el.ondragstart=e=>e.dataTransfer.setData('text/plain',JSON.stringify(d));
+    el.onclick=ev=>{ if(ev.target.classList.contains('dadd'))return; el.classList.toggle('open'); };
+    el.innerHTML=`<div class="dh"><span class="dn">${esc(d.name)}</span><span class="cat">${esc(d.category)}</span></div>
+      <div class="dm">${d.minutes} min · tap to expand</div>
+      <div class="dpts">${esc(d.coachingPoints||'')}</div>
+      ${d.image?`<img class="thumb" src="${d.image}"/>`:''}
+      <div class="dadd" onclick='addDrillSegment(${JSON.stringify(d)})'>＋ add as segment</div>`;
+    list.appendChild(el);
+  });
+}
+
+/* ---------- segment ops ---------- */
+function setSeg(i,k,v){ state.plan.segments[i][k]=v; touch(); }
+function toggleSeg(i){ state.plan.segments[i].open=!state.plan.segments[i].open; renderSegments(); }
+function addSegment(){ state.plan.segments.push(seg("",0)); touch(); renderSegments(); }
+function removeSeg(i){ state.plan.segments.splice(i,1); touch(); renderSegments(); }
+function moveSeg(i,d){ const j=i+d; if(j<0||j>=state.plan.segments.length)return;
+  const a=state.plan.segments; [a[i],a[j]]=[a[j],a[i]]; touch(); renderSegments(); }
+function dropDrill(e,i){
+  try{ const d=JSON.parse(e.dataTransfer.getData('text/plain'));
+    const s=state.plan.segments[i];
+    s.drill=d.name; s.points=d.coachingPoints||s.points;
+    if(!s.minutes) s.minutes=d.minutes||0;
+    if(!s.label) s.label=d.category;
+    touch(); renderSegments();
+  }catch(err){}
+}
+function addDrillSegment(d){ state.plan.segments.push(seg(d.category,d.minutes,d.name,d.coachingPoints)); touch(); renderSegments(); }
+
+/* ---------- attachments ---------- */
+function pickFile(i){ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/pdf,image/*';
+  inp.onchange=()=>{ if(inp.files[0]) attachFile(i,inp.files[0]); }; inp.click(); }
+function attachFile(i,file){
+  if(file.size>4*1024*1024 && !confirm("That file is large ("+Math.round(file.size/1024/1024)+"MB) and may not fit in browser storage. Attach anyway?")) return;
+  const r=new FileReader();
+  r.onload=()=>{ state.plan.segments[i].attach={name:file.name,type:file.type,data:r.result}; touch(); renderSegments(); };
+  r.readAsDataURL(file);
+}
+
+/* ---------- templates ---------- */
+function userTemplates(){ return load("slaam_user_templates",{}); }
+function refreshTemplateList(){
+  const t=document.getElementById('tmpl'); t.innerHTML='<option value="">— start from a template —</option>';
+  const og=document.createElement('optgroup'); og.label='Provided';
+  og.appendChild(opt("SLAAM Default")); t.appendChild(og);
+  const ut=userTemplates(); const keys=Object.keys(ut);
+  if(keys.length){ const og2=document.createElement('optgroup'); og2.label='My Templates';
+    keys.sort().forEach(k=>og2.appendChild(opt(k))); t.appendChild(og2); }
+}
+function opt(v){ const o=document.createElement('option'); o.value=v; o.textContent=v; return o; }
+function applyTemplate(name){
+  if(!name)return;
+  if(state.dirty && !confirm("Replace current segments with the “"+name+"” template?")) { document.getElementById('tmpl').value=""; return; }
+  let layout;
+  if(name==="SLAAM Default") layout=DEFAULT_TEMPLATE;
+  else { const ut=userTemplates(); layout=ut[name]; }
+  if(layout) state.plan.segments=layout.map(([label,minutes])=>seg(label,minutes));
+  touch(); renderSegments(); document.getElementById('tmpl').value="";
+}
+function saveAsTemplate(){
+  const name=prompt("Name this template (e.g. “Game-Prep Day”):"); if(!name)return;
+  const ut=userTemplates(); ut[name]=state.plan.segments.map(s=>[s.label,s.minutes]);
+  store("slaam_user_templates",ut); refreshTemplateList(); alert("Template saved: "+name);
+}
+
+/* ---------- custom drills ---------- */
+function toggleNewDrill(){ document.getElementById('newDrill').classList.toggle('open'); }
+function saveNewDrill(){
+  const name=document.getElementById('nd_name').value.trim(); if(!name){alert("Name the drill first.");return;}
+  const d={name,category:document.getElementById('nd_cat').value,minutes:+document.getElementById('nd_min').value||0,
+           coachingPoints:document.getElementById('nd_pts').value.trim(),image:""};
+  const f=document.getElementById('nd_img').files[0];
+  const finish=()=>{ state.customDrills.unshift(d); store("slaam_custom_drills",state.customDrills);
+    document.getElementById('nd_name').value="";document.getElementById('nd_pts').value="";document.getElementById('nd_img').value="";
+    toggleNewDrill(); renderDrills(); };
+  if(f){ const r=new FileReader(); r.onload=()=>{d.image=r.result;finish();}; r.readAsDataURL(f); } else finish();
+}
+
+/* ---------- plan persistence ---------- */
+function readMeta(){
+  const p=state.plan;
+  p.team=val('m_team');p.date=val('m_date');p.duration=+val('m_dur')||0;p.coach=val('m_coach');
+  p.location=val('m_loc');p.theme=val('m_theme');p.notes=val('m_notes');
+}
+function writeMeta(){
+  const p=state.plan;
+  set('m_team',p.team);set('m_date',p.date);set('m_dur',p.duration);set('m_coach',p.coach);
+  set('m_loc',p.location);set('m_theme',p.theme);set('m_notes',p.notes);
+}
+function savePlan(){
+  readMeta();
+  const plans=load("slaam_saved_plans",{});
+  const key=(state.plan.team||"Plan")+" — "+(state.plan.date||"undated")+(state.plan.theme?(" — "+state.plan.theme):"");
+  plans[key]=JSON.parse(JSON.stringify(state.plan));
+  store("slaam_saved_plans",plans); state.dirty=false; refreshSavedList(key);
+  alert("Saved: "+key);
+}
+function refreshSavedList(sel){
+  const s=document.getElementById('saved'); const plans=load("slaam_saved_plans",{});
+  s.innerHTML='<option value="">— saved plans —</option>';
+  Object.keys(plans).sort().forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;if(k===sel)o.selected=true;s.appendChild(o);});
+}
+function loadPlan(key){ if(!key)return; const plans=load("slaam_saved_plans",{});
+  if(plans[key]){ state.plan=migrate(JSON.parse(JSON.stringify(plans[key]))); hydrate(); state.dirty=false; } }
+function deleteSaved(){ const key=document.getElementById('saved').value; if(!key)return;
+  if(!confirm("Delete saved plan: "+key+"?"))return;
+  const plans=load("slaam_saved_plans",{}); delete plans[key]; store("slaam_saved_plans",plans); refreshSavedList(); }
+function newPlan(){ if(state.dirty && !confirm("Start a new plan? Unsaved changes will be lost."))return;
+  state.plan=blankPlan(); hydrate(); state.dirty=false; }
+
+/* ---------- import / export ---------- */
+function exportJSON(){ readMeta();
+  const blob=new Blob([JSON.stringify(state.plan,null,2)],{type:"application/json"});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=((state.plan.team||"slaam-plan")+"-"+(state.plan.date||"")).replace(/\s+/g,'_')+".json"; a.click();
+}
+function importJSON(ev){ const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=()=>{ try{ state.plan=migrate(JSON.parse(r.result)); hydrate(); state.dirty=true; }catch(e){alert("Couldn’t read that file.");} };
+  r.readAsText(f); ev.target.value="";
+}
+
+/* ---------- utils ---------- */
+function migrate(p){ // tolerate older plans that used "blocks"
+  if(!p.segments && p.blocks) p.segments=p.blocks;
+  (p.segments||[]).forEach(s=>{ if(s.detail===undefined)s.detail=""; if(s.attach===undefined)s.attach=null; if(s.drawBox===undefined)s.drawBox=false; s.open=false; });
+  if(!p.segments) p.segments=[];
+  return p;
+}
+function val(id){return document.getElementById(id).value;}
+function set(id,v){document.getElementById(id).value=v==null?"":v;}
+function esc(s){return (s==null?"":String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hydrate(){ writeMeta(); renderFocus(); renderSegments(); }
+
+/* ---------- init ---------- */
+function init(){ refreshTemplateList(); hydrate(); renderDrills(); refreshSavedList(); }
+init();
+</script>
+</body>
+</html>
