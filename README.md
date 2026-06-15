@@ -4,8 +4,9 @@ Interactive, branded practice-planning tool for SLAAM Basketball (Pittsburgh, PA
 Built as the v1 prototype for the NextEdge Playbook **Practice Plan** feature.
 
 ## 🏀 Live tool
-Once GitHub Pages is on, the planner is live at:
-**https://maceyhollenshead.github.io/slaam-practice-planner/**
+It's live (auto-deploys from `main` via GitHub Pages):
+- **Practice Planner →** https://maceyhollenshead.github.io/slaam-practice-planner/
+- **Drill Library →** https://maceyhollenshead.github.io/slaam-practice-planner/drills.html
 
 Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PDF** (works on iPhone/Android).
 
@@ -16,7 +17,7 @@ Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PD
 | `drills.html` | The SLAAM Drill Library — shared, searchable, printable drill bank (30 drills, purpose + setup + coaching points) |
 | `SLAAM_Standard.docx` | The "SLAAM Standard" coaching-identity 1-pager (printable) |
 | `SLAAM_Practice_Plan.docx` | Printable fill-in practice plan template |
-| `build.js` | Generator script for the two .docx files (`node build.js`) |
+| `build.js` | Generator for the two .docx files — run `npm install` once, then `npm run build:docs` (writes both .docx to the repo root) |
 | `SLAAM_TRACKER.md` | Running tracker of the SLAAM × NextEdge project (ideas, decisions, roadmap) |
 
 ## Planner features (v1.3)
@@ -26,7 +27,7 @@ Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PD
 - **Start time → live clock:** set when practice starts and each segment shows the **wall-clock time** it begins (e.g. 2:00p, 2:08p…). Change any segment's minutes and the whole schedule re-times — glance at your watch to see if you're on pace. Shows projected end time too.
 - **Segments** (time blocks) with live total vs. target duration
 - **⋯ panel** per segment: notes (teams/extra items), drop a PDF/image, or a blank **draw box** to sketch plays by hand
-- **Drill Library** — drag a drill onto a segment; add your own drills (with diagram images)
+- **Drill Library** — 30 seeded SLAAM drills; drag/tap a drill onto a segment, add your own (with diagram images), or open the full shared **[Drill Library](drills.html)** (searchable, printable, with purpose + setup + coaching points)
 - **One "SLAAM Default" template** + **Save as template** to build your own presets
 - Save plans, Export/Import JSON, Print/PDF
 - Storage is per-device (localStorage) — the shared-bank version is the future Playbook backend (Supabase)

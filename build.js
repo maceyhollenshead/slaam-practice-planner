@@ -346,7 +346,7 @@ const planDoc = new Document({
 
 // ---- write ----
 (async () => {
-  fs.writeFileSync("slaam_kit/SLAAM_Standard.docx", await Packer.toBuffer(standardDoc));
-  fs.writeFileSync("slaam_kit/SLAAM_Practice_Plan.docx", await Packer.toBuffer(planDoc));
+  fs.writeFileSync("SLAAM_Standard.docx", await Packer.toBuffer(standardDoc));
+  fs.writeFileSync("SLAAM_Practice_Plan.docx", await Packer.toBuffer(planDoc));
   console.log("wrote SLAAM_Standard.docx and SLAAM_Practice_Plan.docx");
 })();

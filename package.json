@@ -1,0 +1,12 @@
+{
+  "name": "slaam-practice-planner",
+  "version": "1.3.0",
+  "description": "SLAAM Practice Planner + printable kit — Powered by NextEdge",
+  "private": true,
+  "scripts": {
+    "build:docs": "node build.js"
+  },
+  "dependencies": {
+    "docx": "^9.7.1"
+  }
+}

@@ -1,9 +1,13 @@
 # SLAAM × NextEdge — Partnership & Build Tracker
 
-**Status:** Active brainstorm → first deliverables
+**Status:** v1 deliverables shipped & **live** → coach is testing; next = onboarding kit + Playbook-tab scoping
 **Owner:** Macey
-**Started:** 2026-06-14
+**Started:** 2026-06-14 · **Last updated:** 2026-06-15
 **Engagement level:** Light-touch. Easy wins for the coach, real upside for NextEdge. Not building a full custom system.
+
+**Live (GitHub Pages, auto-deploys from `main`):**
+- Practice Planner — https://maceyhollenshead.github.io/slaam-practice-planner/
+- Drill Library — https://maceyhollenshead.github.io/slaam-practice-planner/drills.html
 
 ---
 
@@ -26,21 +30,23 @@
 
 ### Track A — Printable templates (easy wins, ship first)
 Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
-- [x] **The SLAAM Standard** (1-pager) — `slaam_kit/SLAAM_Standard.docx` ✅ built, branded (pink/lime), validated
-- [x] **Practice Plan template** — `slaam_kit/SLAAM_Practice_Plan.docx` ✅ built, fillable/printable, validated
+- [x] **The SLAAM Standard** (1-pager) — `SLAAM_Standard.docx` ✅ built, branded (pink/lime), validated
+- [x] **Practice Plan template** — `SLAAM_Practice_Plan.docx` ✅ built, fillable/printable, validated
 - [x] **Drill Library** — `drills.html` ✅ shared, searchable, printable SLAAM drill bank (30 drills: purpose, setup, coaching points, time, age level), branded + linked from the planner; same drills seeded into the planner's in-tool library. ← this is what actually normalizes coaching. Next: swap in the coach's real drills.
 - [ ] **AI plan-generator prompt** — copy-paste prompt: coach types "U14, 90 min, transition D focus" → filled plan in SLAAM format
-- _Note: generator at `slaam_kit/build.js`. No LibreOffice locally → can't render image previews; docs validate clean._
+- _Note: generator at `build.js` (`node build.js` regenerates both .docx). No LibreOffice locally → can't render image previews; docs validate clean._
 
-### Track B — Interactive Practice Planner (prototype)
-- [x] **v1 standalone HTML** — `slaam_kit/practice_planner.html` ✅ single self-contained file, offline, SLAAM-branded
-  - Layout dropdowns (90-min Skills / Game-Prep / Defense&Compete / Youth / Blank) that prefill blocks
-  - Editable time-blocks w/ live total vs target duration; add/remove/reorder
-  - Drill Library (10 seeded SLAAM drills) — drag onto a block or "add as block"; search
+### Track B — Interactive Practice Planner (prototype) — v1.3, LIVE
+- [x] **Standalone HTML, deployed** — `index.html` (+ identical `practice_planner.html`) ✅ single self-contained file, offline, SLAAM-branded, live on GitHub Pages
+  - Template picker ("SLAAM Default" + "Save as template" to build presets) that prefills segments
+  - Editable time-segments w/ live total vs target duration; add/remove/reorder
+  - **Start time + clock column (v1.2):** set when practice starts → each segment shows its wall-clock start, re-times on any change, shows projected end (coach checks watch vs plan)
+  - **Mobile/iPhone friendly (v1.3):** table reshapes into tap cards, 16px inputs (no zoom), finger-sized buttons, tap-to-add drills (drag still works on laptop)
+  - Drill Library (**30** seeded SLAAM drills) — drag onto a segment or tap "+ add as segment"; search · links to the full `drills.html`
   - "Add a drill you drew up" → custom drill w/ optional image (stands in for the diagram-link)
-  - Save to "My Plans" (localStorage = the folder) · Export/Import JSON · Print/PDF (print CSS hides UI)
+  - Save to "My Plans" (localStorage = the folder, **per-device**) · Export/Import JSON · Print/PDF (print CSS hides UI)
   - Data model = Drill / Plan / Folder → maps directly to Playbook port
-- Plan: get coach feedback on v1/v2 before investing in real Playbook storage/backend. Macey est. ~1 week / 4-5 sessions to polish.
+- Plan: get coach feedback on the live link before investing in real Playbook storage/backend. Macey est. ~1 week / 4-5 sessions to polish.
 
 ### Track B — SLAAM gets their own Playbook login (product)
 - Give the **whole program one shared login** (NOT building multi-coach tiers yet — explicitly deferred).
@@ -72,13 +78,21 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 - [x] **Colors** — **lime green + bright pink** (from their Twitter). Using pink `#FF2D8E` (primary) + lime `#C6FF1A` (secondary), black on white for print.
 - [ ] **Logo** file (square SLAAM mark) to drop into doc headers
 - [ ] Their **set plays** (for the Play Book in the diagram tool)
-- [ ] Scope the **Practice Plan tab** build in the Playbook (basketball-playbook repo)
+- [ ] Their **real drills** (to replace the 30 placeholder drills in the library = makes it truly "the SLAAM way" + captures IP)
+- [ ] Which **scheduling** pain he means (gym slots vs coach availability vs parent comms) — drives whether/what we build there
+- [~] Scope the **Practice Plan tab** in the Playbook — *direction decided (2026-06-15); grounded scope pending a session with `basketball-playbook`*
 
 ## Next steps
-1. Gather SLAAM branding inputs (colors/logo/region/identity).
-2. Build Track A: **SLAAM Standard + Practice Plan template** as branded `.docx`.
-3. Scope the Practice Plan tab (Track B) — what's the minimal template to ship in the Playbook.
-4. Stand SLAAM up on a shared Playbook login.
+**Done:** branding gathered · SLAAM Standard + Practice Plan `.docx` · interactive planner (v1.3, start-time/clock + mobile) · Drill Library (30 drills) · deployed live on GitHub Pages.
+1. **Coach tests the live link** — gather feedback on the planner + drill library.
+2. **Collect his real inputs** — his drills (→ replace placeholders), logo, set plays; clarify the scheduling pain.
+3. **Build the onboarding kit** ("The SLAAM Way") — non-negotiables card + terminology glossary + "how to run a SLAAM practice" 1-pager (bundles with Standard + plan + drills).
+4. **AI plan-generator** — Tier 1 copy-paste prompt (quick win for his "no AI for planning" gap).
+5. **Scope the Practice Plan tab** in a session scoped to `basketball-playbook` (use the kickoff prompt below) → grounded phase plan → stand SLAAM up on a shared login.
+
+## Next-session kickoff prompt (Playbook-tab scoping)
+Paste into a new session scoped to `basketball-playbook` **and** `slaam-practice-planner`:
+> We're extending the NextEdge Playbook (basketball-playbook) to add a Practice Planner. Context, decisions, and the data model are in `slaam-practice-planner/SLAAM_TRACKER.md` — read that first (esp. the 2026-06-15 "Playbook port direction"). Then investigate the basketball-playbook codebase and tell me, grounded in the actual code: the stack/framework and whether it uses Supabase (auth + Postgres); what auth exists today (single-user? how do logins work?); the data model (how plays, folders, diagrams are stored — tables/migrations/types); whether any org/team/multi-user concepts exist; and how the diagram editor works at a high level. Then give me a grounded, phase-by-phase scope to add a Practice Planner **tab** on a **single shared login**, reusing existing auth/DB/diagram engine, with a forward-compatible schema (stub orgId/teamId), using the HTML prototype (index.html, drills.html) as the clickable spec. Don't write code yet — investigation + scope first.
 
 ## Practice Plan builder — data model (2026-06-14)
 Practice plan = same shape as a play (saved object in a folder). Reuses Playbook architecture.
