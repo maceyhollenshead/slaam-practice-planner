@@ -57,6 +57,8 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 - Deferring practice **scheduling/logistics** — lower leverage, messier. Lead with practice **planning**. (2026-06-14)
 - One shared program login; **no multi-coach tiers** for now. (2026-06-14)
 - Deliverables must be SLAAM-branded AND benefit NextEdge (co-brand + data). (2026-06-14)
+- **Playbook port direction (2026-06-15):** add the **Practice Planner as a new tab inside basketball-playbook** on a **single shared SLAAM login** (Playbook is single-user today — that's fine). Do NOT build real multi-user/roles until usage justifies it. Design the schema **forward-compatible** (stub `orgId`/`teamId` on Plan/Drill now) so multi-tenant is a later wrapper, not a rewrite. Accepted trade-offs of shared login: no per-coach attribution, everyone can edit/delete everything, one shared password.
+- **Next investigative step:** read `basketball-playbook` (TypeScript, private) to confirm what auth/DB/storage exists, then write a grounded phase-by-phase scope for the tab. Requires a session scoped to that repo.
 
 ## SLAAM identity (from slaambasketball.com, 2026-06-14)
 - **Program:** SLAAM Basketball — **girls'** AAU, **Pittsburgh PA ("the 412")**. Travels PA/NY/WV/OH/MD/NJ.
@@ -81,10 +83,11 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 ## Practice Plan builder — data model (2026-06-14)
 Practice plan = same shape as a play (saved object in a folder). Reuses Playbook architecture.
 ```
-Drill  = { name, category, minutes, coachingPoints, diagram }   // a diagram + metadata
-Plan   = { team, date, theme, blocks: [ {label, minutes, drillRef?, notes} ] }
+Drill  = { orgId, name, category, minutes, purpose, setup, coachingPoints, ageLevel, diagram }  // a diagram + metadata
+Plan   = { orgId, teamId, team, date, theme, startTime, blocks: [ {label, minutes, drillRef?, notes} ] }
 Folder = [ Plan, ... ]   // same folder system as plays
 ```
+- **Forward-compatible note (2026-06-15):** include `orgId`/`teamId` from day one even on the single shared login (one org today). Multi-tenant then becomes filtering by org/team, not a schema rewrite. `startTime` already shipped in the HTML prototype (clock column).
 - Dropdowns = pick a **layout/template** that pre-fills blocks (e.g. "90-min skills day", "game-prep day").
 - Drag a drill from the **Drill Library** into a block. Drill = a diagram drawn in the existing tool + metadata. ← NextEdge differentiator (links drawn drill → plan).
 - **Build order decision:** standalone interactive **HTML prototype FIRST** (usable now + becomes the clickable spec) → then port the winning layout into the real **Practice Plan tab** in basketball-playbook (shared login, real diagram engine, server storage).
