@@ -1,8 +1,8 @@
 # SLAAM × NextEdge — Partnership & Build Tracker
 
-**Status:** v1 deliverables shipped & **live** → coach is testing; next = onboarding kit + Playbook-tab scoping
+**Status:** v1 deliverables shipped & **live** → coach is testing; Playbook-tab scope now **grounded** in the basketball-playbook code; next = onboarding kit + build
 **Owner:** Macey
-**Started:** 2026-06-14 · **Last updated:** 2026-06-15
+**Started:** 2026-06-14 · **Last updated:** 2026-06-16
 **Engagement level:** Light-touch. Easy wins for the coach, real upside for NextEdge. Not building a full custom system.
 
 **Live (GitHub Pages, auto-deploys from `main`):**
@@ -63,8 +63,8 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 - Deferring practice **scheduling/logistics** — lower leverage, messier. Lead with practice **planning**. (2026-06-14)
 - One shared program login; **no multi-coach tiers** for now. (2026-06-14)
 - Deliverables must be SLAAM-branded AND benefit NextEdge (co-brand + data). (2026-06-14)
-- **Playbook port direction (2026-06-15):** add the **Practice Planner as a new tab inside basketball-playbook** on a **single shared SLAAM login** (Playbook is single-user today — that's fine). Do NOT build real multi-user/roles until usage justifies it. Design the schema **forward-compatible** (stub `orgId`/`teamId` on Plan/Drill now) so multi-tenant is a later wrapper, not a rewrite. Accepted trade-offs of shared login: no per-coach attribution, everyone can edit/delete everything, one shared password.
-- **Next investigative step:** read `basketball-playbook` (TypeScript, private) to confirm what auth/DB/storage exists, then write a grounded phase-by-phase scope for the tab. Requires a session scoped to that repo.
+- **Playbook port direction (2026-06-15):** add the **Practice Planner as a new tab inside basketball-playbook** on a **single shared SLAAM login** (~~Playbook is single-user today~~ — *corrected 2026-06-16: it already has team-level multi-user; see "Grounded Playbook scope" below*). Do NOT build real multi-user/roles until usage justifies it. Design the schema **forward-compatible** (stub `orgId`/`teamId` on Plan/Drill now) so multi-tenant is a later wrapper, not a rewrite. Accepted trade-offs of shared login: no per-coach attribution, everyone can edit/delete everything, one shared password.
+- ~~**Next investigative step:** read `basketball-playbook`...~~ **Done 2026-06-16** → see "Grounded Playbook scope (2026-06-16)" below. The single-shared-login direction holds; only the "single-user today" premise was off (team/role tables already exist).
 
 ## SLAAM identity (from slaambasketball.com, 2026-06-14)
 - **Program:** SLAAM Basketball — **girls'** AAU, **Pittsburgh PA ("the 412")**. Travels PA/NY/WV/OH/MD/NJ.
@@ -80,7 +80,7 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 - [ ] Their **set plays** (for the Play Book in the diagram tool)
 - [ ] Their **real drills** (to replace the 30 placeholder drills in the library = makes it truly "the SLAAM way" + captures IP)
 - [ ] Which **scheduling** pain he means (gym slots vs coach availability vs parent comms) — drives whether/what we build there
-- [~] Scope the **Practice Plan tab** in the Playbook — *direction decided (2026-06-15); grounded scope pending a session with `basketball-playbook`*
+- [x] Scope the **Practice Plan tab** in the Playbook — *direction decided (2026-06-15); **grounded scope delivered 2026-06-16** from a `basketball-playbook` session (see "Grounded Playbook scope" below)*
 
 ## Next steps
 **Done:** branding gathered · SLAAM Standard + Practice Plan `.docx` · interactive planner (v1.3, start-time/clock + mobile) · Drill Library (30 drills) · deployed live on GitHub Pages.
@@ -93,6 +93,30 @@ Branded, fill-in-and-print `.docx`. No login, no build. Usable next practice.
 ## Next-session kickoff prompt (Playbook-tab scoping)
 Paste into a new session scoped to `basketball-playbook` **and** `slaam-practice-planner`:
 > We're extending the NextEdge Playbook (basketball-playbook) to add a Practice Planner. Context, decisions, and the data model are in `slaam-practice-planner/SLAAM_TRACKER.md` — read that first (esp. the 2026-06-15 "Playbook port direction"). Then investigate the basketball-playbook codebase and tell me, grounded in the actual code: the stack/framework and whether it uses Supabase (auth + Postgres); what auth exists today (single-user? how do logins work?); the data model (how plays, folders, diagrams are stored — tables/migrations/types); whether any org/team/multi-user concepts exist; and how the diagram editor works at a high level. Then give me a grounded, phase-by-phase scope to add a Practice Planner **tab** on a **single shared login**, reusing existing auth/DB/diagram engine, with a forward-compatible schema (stub orgId/teamId), using the HTML prototype (index.html, drills.html) as the clickable spec. Don't write code yet — investigation + scope first.
+
+## Grounded Playbook scope (2026-06-16, from a basketball-playbook session)
+Read the real `basketball-playbook` code (migrations, FastAPI routes/models, React auth + diagram editor, the two prototype HTML files). Findings vs. our 2026-06-15 assumptions:
+
+**Stack (confirmed):** React+TS+Vite on Vercel · FastAPI on Railway · **Supabase = both Postgres AND auth** · Stripe ($5/mo, gates a read-only mode) · Modal/YOLO for the video path (irrelevant to the planner).
+
+**Auth (correction):** login is Supabase email/password; JWT sent as Bearer on every API call; backend verifies via `supabase.auth.get_user`. It is **NOT single-user** — there's already a `team_role` enum (`admin/coach/assistant/player`) with RBAC (players can't edit; only coaches/admins delete). The **single shared login still works with zero auth changes**: provision one Supabase user → one team (role `admin`); the Playbook page auto-selects `teams[0]`. ⚠️ That shared account must be subscription-`active` or the diagram editor is read-only.
+
+**Data model (confirmed + refined):** `teams` → `team_members(role)` → `folders(team_id)` → `plays(team_id, created_by, diagram_data JSONB, folder_id, tags, is_public, public_slug)`. RLS on every table **and** in-code membership checks (backend uses the service-role key, which bypasses RLS — so new tables need both). A **play = a row whose `diagram_data` JSONB is the whole diagram** (`{frames, currentFrameIndex, courtType}`).
+
+**Org/team reality (the key correction):** team-level multi-user **already exists**; **org-level does NOT** (no `organizations` table, no per-org branding/templates/drill-bank). So `teamId` is **real and enforced today — it does NOT need stubbing**; only **`orgId` is the genuinely missing forward-compat stub**. Our 2026-06-14 data-model block (below) over-stubs `teamId`; treat it as a real FK, not a placeholder.
+
+**Diagram editor (reusable as-is):** `DiagramEditor` is a self-contained forwardRef component — props `initialData: PlayDiagramData`, `onSave(data, name)`, `onBack`, handle exposes `hasUnsavedChanges`/`save()`. Multi-frame animation + jsPDF export built in. It knows nothing about "plays" — it just edits a diagram blob. **A drill = same artifact as a play (diagram + metadata)** → reuse this component verbatim. A **Plan is NOT a diagram** (it's a list of segments that *reference* drills) → it needs its own table/JSONB.
+
+**Phase-by-phase scope (single shared login, reuse auth/DB/editor, stub `orgId`):**
+0. **Lock decisions:** confirm shared-login provisioning + `active` sub; pick drill storage (rec: new `drills` table mirroring `plays`, vs. reuse `plays` with a discriminator); freeze Plan/Segment + Drill JSON from the prototype; stub nullable `org_id` on new tables (`team_id` already real).
+1. **Provision SLAAM** (little/no code): one user + team + admin membership; verify they can already use Playbook + editor.
+2. **Migrations `005`:** `drills`, `practice_plans` (segments JSONB, each seg optional `drill_id`), `practice_templates`; RLS mirroring `plays`; seed the 30 SLAAM drills + "SLAAM Default" template.
+3. **Backend:** `drills` / `practice_plans` / `practice_templates` Pydantic models + CRUD routes (copy `plays.py`/`folders.py` membership pattern); register in `api/__init__.py`; add client fns to `services/api.ts`.
+4. **Frontend tab:** one `navItems` entry in `Layout.tsx` + nested `/dashboard/practice` route in `App.tsx`; port `index.html` (details, focus chips, **segments table w/ rolling clock column**, total-vs-target pill, templates, drill-library panel); plans list reuses the folder sidebar; Supabase persistence + print/PDF CSS.
+5. **Differentiator:** drill ⇄ diagram — "draw a drill" opens `DiagramEditor`; segments link to a drill's diagram.
+6. **Branding/forward-compat:** SLAAM theme as *per-team* now (the seam where per-*org* branding lands later); leave `org_id` nullable; document the `organizations` migration path.
+
+**Process note:** `frontend/CLAUDE.md` mandates plan-first + **never push `main`** (Vercel/Railway auto-deploy from it); work on `dev`. The reusable engine + auth/DB mean the planner is a **module, not a rebuild** — new work ≈ 3 tables + 3 CRUD routes + porting the prototype UI.
 
 ## Practice Plan builder — data model (2026-06-14)
 Practice plan = same shape as a play (saved object in a folder). Reuses Playbook architecture.
@@ -146,3 +170,4 @@ Coach's words after seeing v1: *"I'm using AI a little for design, not at all fo
 - 2026-06-14 — Practice plan + drill bank are the *same artifact* as "normalize coaching" — a shared format/standard.
 - 2026-06-14 — Templates (print) AND product (Playbook login) are parallel, not either/or. Print = instant win; Playbook = stickier + data.
 - 2026-06-14 — Practice Plan tab in Playbook: roadmap item, possible quick win since the tooling exists.
+- 2026-06-16 — Scoped the Playbook tab against the real `basketball-playbook` code (see "Grounded Playbook scope"). Confirms it's Supabase auth+Postgres with a reusable `DiagramEditor` → planner is a module, not a rebuild. **Correction to the 2026-06-15 premise:** Playbook is NOT single-user — `teams`/`team_members`/role enum already exist, so `teamId` is a real enforced FK (only `orgId` needs stubbing). Single-shared-login direction still holds (provision one user+team). Caveat: the shared account must hold an active subscription or the editor goes read-only.
