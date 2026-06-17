@@ -35,5 +35,14 @@ Open it on a laptop, tablet, or phone. Build a plan, then **Print → Save as PD
 ## Editing on your phone
 Open this repo in the GitHub mobile app or github.com, edit `index.html`, commit — GitHub Pages redeploys automatically in ~1 min.
 
+## Where this is headed (NextEdge integration)
+This standalone tool is the **AAU reference pack** for the unified NextEdge Playbook. The plan: one shared
+engine + a **NextEdge Standard** base + **persona packs** (College / High School / AAU / Trainer). SLAAM
+becomes the **AAU pack and first AAU tenant**; **GW women's basketball** is the **College pack**. The
+Practice Planner ports into the Playbook as a logged-in module (Plays + Practice Plans + Video, one login),
+with SLAAM branding and the SLAAM drill bank seeding the AAU pack. See `SLAAM_TRACKER.md` →
+"NextEdge integration", and the master plan in the `basketball-playbook` repo at
+`docs/practice-plans/HANDOFF.md`.
+
 ---
 *SLAAM Basketball · @SLAAMBASKETBALL — Powered by NextEdge*

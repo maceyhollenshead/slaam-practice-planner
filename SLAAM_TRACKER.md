@@ -1,8 +1,8 @@
 # SLAAM × NextEdge — Partnership & Build Tracker
 
-**Status:** v1 deliverables shipped & **live** → coach is testing; next = onboarding kit + Playbook-tab scoping
+**Status:** v1 deliverables shipped & **live** → coach is testing. Architecture decided (2026-06-16): SLAAM = the **AAU persona pack / first AAU tenant** in the unified NextEdge Playbook (see "NextEdge integration" below). Next = onboarding kit + port into the Playbook Practice Plans module.
 **Owner:** Macey
-**Started:** 2026-06-14 · **Last updated:** 2026-06-15
+**Started:** 2026-06-14 · **Last updated:** 2026-06-16
 **Engagement level:** Light-touch. Easy wins for the coach, real upside for NextEdge. Not building a full custom system.
 
 **Live (GitHub Pages, auto-deploys from `main`):**
@@ -146,3 +146,32 @@ Coach's words after seeing v1: *"I'm using AI a little for design, not at all fo
 - 2026-06-14 — Practice plan + drill bank are the *same artifact* as "normalize coaching" — a shared format/standard.
 - 2026-06-14 — Templates (print) AND product (Playbook login) are parallel, not either/or. Print = instant win; Playbook = stickier + data.
 - 2026-06-14 — Practice Plan tab in Playbook: roadmap item, possible quick win since the tooling exists.
+- 2026-06-16 — Unified architecture decided: one NextEdge engine + **NextEdge Standard** base + **persona packs** (College / High School / AAU / Trainer). **SLAAM = AAU reference pack & tenant; GW women's = College pack.** Generic roster unit (`team | group | athlete`) makes trainers a later content add, not a rewrite. Master plan lives in `basketball-playbook` → `docs/practice-plans/HANDOFF.md`.
+
+---
+
+## NextEdge integration — SLAAM as the AAU persona pack (2026-06-16)
+**How SLAAM fits the unified product.** SLAAM is no longer a standalone tool — it becomes the **AAU/Club reference pack and the first AAU tenant** inside the NextEdge Playbook. A parallel build (**GW women's basketball**) is the **College/D1 reference pack**. Both run on one shared engine — this extends (does not replace) the 6/14–6/15 multi-tenant decisions above.
+
+**The architecture (one engine + persona packs):**
+```
+NextEdge engine (timed sessions + drill/exercise library + print/export)
+ ├─ NextEdge Standard  — neutral BASE pack every client inherits
+ └─ Persona packs (system-authored starter content a tenant inherits, then customizes):
+     ├─ College / D1   → game-week cycle                  ← GW = reference instance
+     ├─ High School    → season cycle (preseason / in-season / game-week-lite / tryouts)
+     ├─ AAU / Club     → tournament-weekend + skills days  ← SLAAM = reference instance (THIS repo)
+     └─ Trainer        → individual & small-group workouts (schema-ready, authored later)
+```
+
+**What this means for SLAAM:**
+- SLAAM logs into the **NextEdge Playbook** (one shared program login) and gets Plays + **Practice Plans** + Video — Practice Plans is a new module/tab, not a separate site. (Matches the 2026-06-15 "Playbook port direction.")
+- On onboarding, SLAAM's tenant is created with `program_type = AAU` → **inherits the AAU pack** (seeded from SLAAM's templates + drill bank) → customizes with SLAAM branding (pink `#FF2D8E` / lime `#C6FF1A`), the coach's real drills, and set plays.
+- The roster layer is generic — `team | group | athlete` — so SLAAM's 23 teams (4th–17U) become roster units under the SLAAM org; individual/group workouts use the same schema later.
+- This standalone HTML planner (`index.html`, `drills.html`) stays the **clickable spec** for the AAU pack; it gets ported into React/Supabase the same way the GW prototype will.
+
+**Relationship to GW:** College (GW) and AAU (SLAAM) share the engine, the base library, and the schema. Game-week templates and tournament-weekend/skills templates are just different **packs** — built once, reused. Engine fixes/features land for both at once.
+
+**Where the master plan lives:** `basketball-playbook` → branch `claude/gw-womens-basketball-planner-wzr34l` → `docs/practice-plans/HANDOFF.md` (full architecture, decisions, the v1 Supabase migration plan, and the GW prototype). Read it alongside this tracker.
+
+**SLAAM to-dos to finish the AAU pack:** swap the 30 placeholder drills for SLAAM's real drills; add the SLAAM logo; capture SLAAM set plays (for the diagram tool); confirm whether scheduling is in scope.
