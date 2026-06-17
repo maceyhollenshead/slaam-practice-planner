@@ -1,8 +1,8 @@
 # SLAAM × NextEdge — Partnership & Build Tracker
 
-**Status:** v1 deliverables shipped & **live** → coach is testing; Playbook-tab scope now **grounded** in the basketball-playbook code; next = onboarding kit + build
+**Status:** v1 deliverables shipped & **live** → coach is testing; Practice Planner tab **built & build-verified** in basketball-playbook (Phases 1–6, feature branch, not `main`); next = manual ops (run migration `005` + provision shared login + seed drills) → eyes-on test → deploy
 **Owner:** Macey
-**Started:** 2026-06-14 · **Last updated:** 2026-06-16
+**Started:** 2026-06-14 · **Last updated:** 2026-06-17
 **Engagement level:** Light-touch. Easy wins for the coach, real upside for NextEdge. Not building a full custom system.
 
 **Live (GitHub Pages, auto-deploys from `main`):**
@@ -176,6 +176,7 @@ Coach's words after seeing v1: *"I'm using AI a little for design, not at all fo
 - 2026-06-14 — Practice plan + drill bank are the *same artifact* as "normalize coaching" — a shared format/standard.
 - 2026-06-14 — Templates (print) AND product (Playbook login) are parallel, not either/or. Print = instant win; Playbook = stickier + data.
 - 2026-06-14 — Practice Plan tab in Playbook: roadmap item, possible quick win since the tooling exists.
+- 2026-06-17 — **Practice Planner polish (Batches A/B/C)** on the same feature branch: (A) "Load 30 SLAAM starter drills" button + drill metadata edit/create modal + per-drill delete + ▣ "view drill diagram" from a plan segment; (B) **SLAAM co-branding scoped to the planner + print** (pink/lime, branded header, "Powered by NextEdge", branded print header — rest of app stays NextEdge); (C) mobile pass (list view stacks, segments table scrolls, DrillEditor toolbar stacks). Also earlier: DrillEditor is a dedicated free-placement editor with movement tools (cut/pass/dribble/handoff/screen/ghost, static). All **build-verified** (`tsc` + `npm run build`), **not click-tested** (no browser in env). Still pending = the same manual ops + an eyes-on run-through before deploy. Status doc: `basketball-playbook/PRACTICE_PLANNER_PLAN.md`.
 - 2026-06-16 — **Built the Practice Planner tab** in `basketball-playbook` (feature branch, not `main`): migration `005` (drills/practice_plans/practice_templates + plays brain-parity), backend CRUD routes, and the React tab (port of the prototype — details, focus chips, segments w/ rolling clock, templates, drill library, "draw a drill" reusing the diagram editor). Verified `tsc` + full `npm run build` pass. **Remaining = manual ops:** provision the shared Supabase login + run `005` + seed the 30 SLAAM drills (need live Supabase). Plan/status doc: `basketball-playbook/PRACTICE_PLANNER_PLAN.md`.
 - 2026-06-16 — Decided drill storage = **new `drills` table** (not reuse `plays`) — keeps the public play-library logic uncoupled, gives drills real metadata columns. Also reserved **brain seams** on `drills`/`practice_plans`: `tags[]`, `source`/`source_file` (upload landing zone), `ai_labels JSONB` → future brain can tag practices/drills and ingest uploaded practices without a schema rewrite. Build plan drafted in `basketball-playbook` on the feature branch (no `main` changes).
 - 2026-06-16 — Scoped the Playbook tab against the real `basketball-playbook` code (see "Grounded Playbook scope"). Confirms it's Supabase auth+Postgres with a reusable `DiagramEditor` → planner is a module, not a rebuild. **Correction to the 2026-06-15 premise:** Playbook is NOT single-user — `teams`/`team_members`/role enum already exist, so `teamId` is a real enforced FK (only `orgId` needs stubbing). Single-shared-login direction still holds (provision one user+team). Caveat: the shared account must hold an active subscription or the editor goes read-only.
